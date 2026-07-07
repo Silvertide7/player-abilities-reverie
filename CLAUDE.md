@@ -7,12 +7,25 @@ A NeoForge mod (Minecraft 1.21.1, NeoForge 21.1.230) implementing the Realms of 
 - Mod id: `pa_reverie`
 - Base package / group: `net.silvertide.pa_reverie`
 - Main mod class: `src/main/java/net/silvertide/pa_reverie/PAReverie.java`
-- Depends on `player_abilities` (required, declared in mods.toml). The gradle dependency comes from CurseMaven once Player Abilities is published; the placeholder line is in `build.gradle`. Until then, no compile dependency is wired.
+- Depends on `player_abilities` (required, declared in mods.toml). The framework jar lives in `libs/` and is referenced from `build.gradle`; swap to the CurseMaven coordinate (placeholder comment in `build.gradle`) once Player Abilities is published. When the framework version bumps, drop the new jar into `libs/` and update the one path.
 
 ## Conventions
 
 - All mod id, name, version, and dependency ranges live in `gradle.properties`.
 - Assets go under `src/main/resources/assets/pa_reverie/`.
+
+## Deviations from the original Realms of Reverie spells
+
+Documented substitutions where the original spells depended on systems this mod does not carry:
+
+- No mana costs (until the framework's Iron's Spellbooks mana compat exists). The original Harvest Spell Power scaling maps to the framework's `player_abilities:ability_power` attribute (radii, capacities, yields, and potencies multiply by it, with the original caps).
+- Deepsight / Fathom's Eye grant vanilla Night Vision (+ Water Breathing for Fathom's Eye) instead of the custom vision effects.
+- Hunter's Mark applies vanilla Glowing to revealed creatures (visible to everyone) instead of caster-only outline rendering.
+- Escape Shaft teleports to the surface with Slow Falling instead of the rise entity; level 3 teleports nearby players too.
+- Transmute recipes are an in-code table in `support/TransmuteRecipes.java` (originally a datapack recipe type); placeholder conversions: copper->iron, iron->gold, gold->diamond.
+- No Quality Food compat in Feast of Life.
+
+Support classes under `support/`, the dry air block, ephemeral food items, and the Tremor Sense client renderer are ported from the Realms of Reverie sources.
 
 ## Build & run
 

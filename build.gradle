@@ -126,7 +126,7 @@ configurations {
 
 dependencies {
     // Player Abilities via CurseMaven once published: implementation "curse.maven:player-abilities-<projectId>:<fileId>"
-    implementation files('../player_abilities/build/libs/player_abilities-0.0.2.jar')
+    implementation files('libs/player_abilities-0.0.4.jar')
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"

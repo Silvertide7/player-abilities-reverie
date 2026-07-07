@@ -1,0 +1,27 @@
+{
+  "replace": false,
+  "values": [
+    "#c:ores",
+    {"id": "minecraft:coal_ore", "required": false},
+    {"id": "minecraft:deepslate_coal_ore", "required": false},
+    {"id": "minecraft:iron_ore", "required": false},
+    {"id": "minecraft:deepslate_iron_ore", "required": false},
+    {"id": "minecraft:copper_ore", "required": false},
+    {"id": "minecraft:deepslate_copper_ore", "required": false},
+    {"id": "minecraft:gold_ore", "required": false},
+    {"id": "minecraft:deepslate_gold_ore", "required": false},
+    {"id": "minecraft:redstone_ore", "required": false},
+    {"id": "minecraft:deepslate_redstone_ore", "required": false},
+    {"id": "minecraft:lapis_ore", "required": false},
+    {"id": "minecraft:deepslate_lapis_ore", "required": false},
+    {"id": "minecraft:diamond_ore", "required": false},
+    {"id": "minecraft:deepslate_diamond_ore", "required": false},
+    {"id": "minecraft:emerald_ore", "required": false},
+    {"id": "minecraft:deepslate_emerald_ore", "required": false},
+    {"id": "minecraft:nether_gold_ore", "required": false},
+    {"id": "minecraft:nether_quartz_ore", "required": false},
+    {"id": "minecraft:ancient_debris", "required": false},
+    {"id": "minecraft:suspicious_sand", "required": false},
+    {"id": "minecraft:suspicious_gravel", "required": false}
+  ]
+}
