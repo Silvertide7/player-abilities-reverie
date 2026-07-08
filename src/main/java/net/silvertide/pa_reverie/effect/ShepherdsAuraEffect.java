@@ -9,7 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.phys.AABB;
-import net.silvertide.pa_reverie.support.ReverieMagicAttributes;
+import net.silvertide.pa_reverie.support.AbilityPower;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -41,8 +41,8 @@ public class ShepherdsAuraEffect extends MobEffect {
     }
 
     private static int scaledAuraRadius(ServerPlayer shepherd, int amplifier) {
-        double harvestPower = shepherd.getAttributeValue(ReverieMagicAttributes.HARVEST_SPELL_POWER);
-        return Math.min(AURA_RADIUS_CAP, (int) Math.round(auraRadiusForAmplifier(amplifier) * harvestPower));
+        double abilityPower = AbilityPower.raw(shepherd);
+        return Math.min(AURA_RADIUS_CAP, (int) Math.round(auraRadiusForAmplifier(amplifier) * abilityPower));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ShepherdsAuraEffect extends MobEffect {
     private void tendFlock(ServerPlayer shepherd, int amplifier) {
         AABB auraBox = shepherd.getBoundingBox().inflate(scaledAuraRadius(shepherd, amplifier));
         List<Animal> flock = shepherd.serverLevel().getEntitiesOfClass(Animal.class, auraBox, Animal::isAlive);
-        float healAmount = (float) ReverieMagicAttributes.scaledByHarvestPower(shepherd, HEAL_AMOUNT_BY_AMPLIFIER[Math.clamp(amplifier, 0, HEAL_AMOUNT_BY_AMPLIFIER.length - 1)]);
+        float healAmount = (float) AbilityPower.scaled(shepherd, HEAL_AMOUNT_BY_AMPLIFIER[Math.clamp(amplifier, 0, HEAL_AMOUNT_BY_AMPLIFIER.length - 1)]);
         int tended = 0;
         for (Animal animal : flock) {
             if (tended >= MAX_FLOCK_SIZE) {

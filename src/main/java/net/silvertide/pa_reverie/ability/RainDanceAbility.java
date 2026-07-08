@@ -205,7 +205,7 @@ public final class RainDanceAbility extends HarvestAbility {
     }
 
     private int cropsGrownPerTick(ServerPlayer player, int level) {
-        return net.silvertide.pa_reverie.support.ReverieMagicAttributes.scaledByHarvestPower(player,
-                CROPS_GROWN_PER_TICK_BY_LEVEL[Math.clamp(level, 1, getMaxLevel()) - 1]);
+        return net.silvertide.pa_reverie.support.AbilityPower.scaled(player,
+                byLevel(level, CROPS_GROWN_PER_TICK_BY_LEVEL));
     }
 }

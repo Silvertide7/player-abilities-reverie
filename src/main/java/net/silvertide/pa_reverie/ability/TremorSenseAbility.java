@@ -10,7 +10,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.silvertide.pa_reverie.network.TremorSenseHighlightPacket;
-import net.silvertide.pa_reverie.support.ReverieMagicAttributes;
+import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.pa_reverie.support.TremorScanner;
 import net.silvertide.pa_reverie.support.TremorSenseCastData;
 import net.silvertide.player_abilities.api.AbilityAPI;
@@ -101,7 +101,7 @@ public final class TremorSenseAbility extends HarvestAbility {
     }
 
     private int maxHighlightedPositionsForLevel(ServerPlayer player, int level) {
-        return ReverieMagicAttributes.scaledByHarvestPower(player,
-                MAX_HIGHLIGHTED_POSITIONS_BY_LEVEL[Math.clamp(level, 1, getMaxLevel()) - 1]);
+        return AbilityPower.scaled(player,
+                byLevel(level, MAX_HIGHLIGHTED_POSITIONS_BY_LEVEL));
     }
 }

@@ -12,7 +12,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.silvertide.pa_reverie.support.ReverieMagicAttributes;
+import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.pa_reverie.network.HunterHighlightPacket;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,8 +40,8 @@ public class HunterEffect extends MobEffect {
     }
 
     private static int scaledScanRadius(ServerPlayer caster, int amplifier) {
-        double harvestPower = caster.getAttributeValue(ReverieMagicAttributes.HARVEST_SPELL_POWER);
-        return Math.min(SCAN_RADIUS_CAP, (int) Math.round(scanRadiusForAmplifier(amplifier) * harvestPower));
+        double abilityPower = AbilityPower.raw(caster);
+        return Math.min(SCAN_RADIUS_CAP, (int) Math.round(scanRadiusForAmplifier(amplifier) * abilityPower));
     }
 
     @Override

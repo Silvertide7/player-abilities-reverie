@@ -12,10 +12,6 @@ import net.silvertide.pa_reverie.registry.ReverieBlocks;
 import net.silvertide.pa_reverie.registry.ReverieDataComponents;
 import net.silvertide.pa_reverie.registry.ReverieEffects;
 import net.silvertide.pa_reverie.registry.ReverieEntities;
-import net.silvertide.pa_reverie.support.ReverieMagicAttributes;
-import net.silvertide.pa_reverie.network.ReverieSpellNetwork;
-import net.silvertide.pa_reverie.support.ExcavateManager;
-import net.silvertide.pa_reverie.support.VerdantCascadeManager;
 import net.silvertide.pa_reverie.transmute.TransmuteRecipes;
 
 @Mod(PAReverie.MOD_ID)
@@ -34,10 +30,6 @@ public class PAReverie {
         ReverieDataComponents.register(modEventBus);
         ReverieEffects.register(modEventBus);
         ReverieEntities.register(modEventBus);
-        ReverieMagicAttributes.register(modEventBus);
         TransmuteRecipes.register(modEventBus);
-        ReverieSpellNetwork.register(modEventBus);
-        VerdantCascadeManager.register();
-        ExcavateManager.register();
     }
 }

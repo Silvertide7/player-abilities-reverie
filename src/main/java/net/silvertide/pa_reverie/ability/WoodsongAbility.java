@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.silvertide.pa_reverie.support.ReverieMagicAttributes;
+import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.pa_reverie.support.TreeScanner;
 import net.silvertide.pa_reverie.support.TreeYields;
 import net.silvertide.pa_reverie.support.WoodsongCastData;
@@ -109,13 +109,13 @@ public final class WoodsongAbility extends HarvestAbility {
             if (yield == null) {
                 return;
             }
-            int totalLogs = ReverieMagicAttributes.scaledByHarvestPower(entity,
+            int totalLogs = AbilityPower.scaled(entity,
                     rollPerTreeInclusive(random, MIN_LOGS_PER_TREE, MAX_LOGS_PER_TREE, treeCount));
-            int totalLeaves = ReverieMagicAttributes.scaledByHarvestPower(entity,
+            int totalLeaves = AbilityPower.scaled(entity,
                     rollPerTreeInclusive(random, MIN_LEAVES_PER_TREE, MAX_LEAVES_PER_TREE, treeCount));
-            int totalSticks = ReverieMagicAttributes.scaledByHarvestPower(entity,
+            int totalSticks = AbilityPower.scaled(entity,
                     rollBonus(random, MAX_BONUS_STICKS_PER_TREE, treeCount));
-            int totalSaplings = ReverieMagicAttributes.scaledByHarvestPower(entity,
+            int totalSaplings = AbilityPower.scaled(entity,
                     rollBonus(random, MAX_BONUS_SAPLINGS_PER_TREE, treeCount));
             dropToPlayer(level, dropPos, entity, new ItemStack(logBlock, totalLogs));
             dropToPlayer(level, dropPos, entity, new ItemStack(yield.leaves(), totalLeaves));

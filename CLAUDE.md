@@ -19,10 +19,10 @@ A NeoForge mod (Minecraft 1.21.1, NeoForge 21.1.230) implementing the Realms of 
 Everything is an exact port of the Realms of Reverie source (effects, entities, managers, scanners, recipe type, configs, particles, sounds, formulas), with only these deviations:
 
 - No mana costs (Iron's Spellbooks pipeline) and no mana-regen attribute modifier on Restful Meditation (Iron's attribute). Everything else about the effects is identical, including Peaceful Reverie's +1 Luck.
-- Iron's `getSpellPower(level, caster)` maps to `HarvestAbility.spellPower(caster, base, perLevel, level)`: the spell's base power scaled by this mod's own `pa_reverie:harvest_spell_power` attribute (ported from the original, multiplier capped at 2.0).
+- Iron's `getSpellPower(level, caster)` maps to `HarvestAbility.spellPower(caster, base, perLevel, level)`: the spell's base power scaled by the framework's `player_abilities:ability_power` attribute via `support/AbilityPower` (multiplier capped at 2.0).
 - Iron's cast pipeline (MagicData/AdditionalCastData) maps to the framework's use pipeline (`AbilityAPI.setUseData`/`getUseData`, `onUseTick`, `onUseReleased`/`onUseComplete`).
 - Cooldowns the user rebalanced after the port: Caisson 600s (source had a 30s test value), Hunter's Mark 300s (source 120s).
-- Farmer's Delight and Quality Food are compileOnly + localRuntime dependencies exactly as in the original (ephemeral foods use FD's Nourishment effect; Feast of Life reads Quality Food quality). Like the original, these are hard runtime requirements in practice.
+- Farmer's Delight and Quality Food are compileOnly + localRuntime at build time (ephemeral foods use FD's Nourishment effect; Feast of Life reads Quality Food quality). Both are optional at runtime: Farmer's Delight is declared `type="optional"` and Quality Food is untracked in mods.toml; each is reached only through a `ModList.isLoaded`-gated bridge (`FarmersDelightCompat`/`QualityFoodCompat`) whose real dependency reference lives in a nested class touched only when the mod is present, so the pack runs standalone.
 
 ## Build & run
 

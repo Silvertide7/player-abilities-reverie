@@ -11,11 +11,12 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.silvertide.pa_reverie.PAReverie;
+import net.silvertide.pa_reverie.client.ClientHunterHandler;
+import net.silvertide.pa_reverie.client.ClientTremorSenseHandler;
 import net.silvertide.pa_reverie.client.EscapeShaftClientGhostShaft;
 import org.jetbrains.annotations.NotNull;
 
 @EventBusSubscriber(modid = PAReverie.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
-@SuppressWarnings("removal")
 public final class ReverieNetworking {
 
     private static final String NETWORK_VERSION = "1";
@@ -24,11 +25,21 @@ public final class ReverieNetworking {
 
     @SubscribeEvent
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar(PAReverie.MOD_ID).versioned(NETWORK_VERSION);
+        PayloadRegistrar registrar = event.registrar(NETWORK_VERSION);
         registrar.playToClient(
                 EscapeShaftSetupPayload.TYPE,
                 EscapeShaftSetupPayload.STREAM_CODEC,
                 ReverieNetworking::handleEscapeShaftSetup
+        );
+        registrar.playToClient(
+                TremorSenseHighlightPacket.TYPE,
+                TremorSenseHighlightPacket.STREAM_CODEC,
+                ClientTremorSenseHandler::handle
+        );
+        registrar.playToClient(
+                HunterHighlightPacket.TYPE,
+                HunterHighlightPacket.STREAM_CODEC,
+                ClientHunterHandler::handle
         );
     }
 

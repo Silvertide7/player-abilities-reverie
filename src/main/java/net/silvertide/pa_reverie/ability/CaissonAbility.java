@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.silvertide.pa_reverie.registry.ReverieBlocks;
 import net.silvertide.pa_reverie.support.CaissonCastData;
-import net.silvertide.pa_reverie.support.ReverieMagicAttributes;
+import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.pa_reverie.support.SphereOffsets;
 import net.silvertide.player_abilities.api.AbilityAPI;
 import net.silvertide.player_abilities.api.AbilityUseType;
@@ -119,7 +119,7 @@ public final class CaissonAbility extends HarvestAbility {
     }
 
     private int bubbleLifetimeTicks(ServerPlayer player, int level) {
-        return ReverieMagicAttributes.scaledByHarvestPower(player,
-                LIFETIME_TICKS_BY_LEVEL[Math.clamp(level, 1, getMaxLevel()) - 1]);
+        return AbilityPower.scaled(player,
+                byLevel(level, LIFETIME_TICKS_BY_LEVEL));
     }
 }

@@ -22,6 +22,9 @@ import java.util.Set;
 
 public class CascadeJob {
 
+    public static final int PROCESS_INTERVAL_TICKS = 4;
+    private static final int TARGET_DURATION_TICKS = 200;
+    private static final int TARGET_WAVE_COUNT = TARGET_DURATION_TICKS / PROCESS_INTERVAL_TICKS;
     private static final int TRAIL_PARTICLE_DENSITY = 2;
     private static final int HARVEST_BURST_PARTICLE_COUNT = 8;
     private static final int PARTICLE_FREQUENCY_DIVISOR = 3;
@@ -70,19 +73,26 @@ public class CascadeJob {
         return NO_ADDITIONAL_OFFSETS;
     }
 
-    public boolean isDone() {
+    public boolean processWave() {
+        if (!isPlayerStillValid()) {
+            return false;
+        }
+        int cropsThisWave = Math.max(1, (chainMax + TARGET_WAVE_COUNT - 1) / TARGET_WAVE_COUNT);
+        for (int i = 0; i < cropsThisWave && !isDone(); i++) {
+            processOne();
+        }
+        return !isDone();
+    }
+
+    private boolean isDone() {
         return queue.isEmpty() || harvestedCount >= chainMax;
     }
 
-    public int getChainMax() {
-        return chainMax;
-    }
-
-    public boolean isPlayerStillValid() {
+    private boolean isPlayerStillValid() {
         return player.isAlive() && !player.hasDisconnected() && player.serverLevel() == level;
     }
 
-    public void processOne() {
+    private void processOne() {
         if (isDone()) {
             return;
         }

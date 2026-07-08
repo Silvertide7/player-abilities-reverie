@@ -36,8 +36,6 @@
   "ability.pa_reverie.woodsong": "Woodsong",
   "ability.pa_reverie.woodsong.description": "Sing to the grown trees within reach. Each one shares its gift — logs, leaves, sticks, and saplings — and remains standing where it grew.",
   "ability_category.pa_reverie.harvest": "Harvest",
-  "attribute.pa_reverie.harvest_magic_resist": "Harvest Magic Resistance",
-  "attribute.pa_reverie.harvest_spell_power": "Harvest Spell Power",
   "block.pa_reverie.dry_air": "Dry Air",
   "effect.pa_reverie.deep_sight": "Deep Sight",
   "effect.pa_reverie.fathoms_eye": "Fathom's Eye",

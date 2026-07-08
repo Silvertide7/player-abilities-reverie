@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.silvertide.pa_reverie.config.ServerConfigs;
-import net.silvertide.pa_reverie.support.ReverieMagicAttributes;
+import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class FeastOfLifeAbility extends HarvestAbility {
@@ -56,22 +56,21 @@ public final class FeastOfLifeAbility extends HarvestAbility {
             return;
         }
         FoodProperties properties = food.get(DataComponents.FOOD);
-        int clampedIndex = Math.clamp(level, 1, getMaxLevel()) - 1;
-        float potency = POTENCY_BY_LEVEL[clampedIndex];
+        float potency = byLevel(level, POTENCY_BY_LEVEL);
         float qualityMultiplier = 1.0f + net.silvertide.pa_reverie.compat.QualityFoodCompat.qualityLevel(food)
                 * ServerConfigs.FEAST_OF_LIFE_QUALITY_BONUS_PER_LEVEL.get().floatValue();
         float multiplier = potency * qualityMultiplier;
 
-        float healAmount = (float) ReverieMagicAttributes.scaledByHarvestPower(
+        float healAmount = (float) AbilityPower.scaled(
                 player, properties.nutrition() * ServerConfigs.FEAST_OF_LIFE_HEALTH_PER_NUTRITION.get().floatValue() * multiplier);
-        float absorptionAmount = (float) ReverieMagicAttributes.scaledByHarvestPower(
+        float absorptionAmount = (float) AbilityPower.scaled(
                 player, properties.saturation() * ServerConfigs.FEAST_OF_LIFE_ABSORPTION_PER_SATURATION.get().floatValue() * multiplier);
 
         for (Player target : player.level().getEntitiesOfClass(
                 Player.class, player.getBoundingBox().inflate(FEAST_SHARE_RADIUS))) {
             target.heal(healAmount);
             target.setAbsorptionAmount(Math.min(MAX_ABSORPTION, target.getAbsorptionAmount() + absorptionAmount));
-            applyFoodEffects(target, properties, clampedIndex);
+            applyFoodEffects(target, properties, level);
             spawnFeastParticles(player.serverLevel(), target);
         }
         food.shrink(1);
@@ -95,8 +94,8 @@ public final class FeastOfLifeAbility extends HarvestAbility {
         return !stack.isEmpty() && stack.has(DataComponents.FOOD);
     }
 
-    private static void applyFoodEffects(LivingEntity entity, FoodProperties properties, int clampedIndex) {
-        float durationMultiplier = EFFECT_DURATION_MULTIPLIER_BY_LEVEL[clampedIndex];
+    private static void applyFoodEffects(LivingEntity entity, FoodProperties properties, int level) {
+        float durationMultiplier = byLevel(level, EFFECT_DURATION_MULTIPLIER_BY_LEVEL);
         for (FoodProperties.PossibleEffect possibleEffect : properties.effects()) {
             MobEffectInstance effect = possibleEffect.effect();
             entity.addEffect(new MobEffectInstance(

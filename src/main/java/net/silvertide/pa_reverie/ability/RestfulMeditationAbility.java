@@ -2,10 +2,12 @@ package net.silvertide.pa_reverie.ability;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.silvertide.pa_reverie.effect.RestfulMeditationEffect;
 import net.silvertide.pa_reverie.registry.ReverieEffects;
 import net.silvertide.player_abilities.api.AbilityUseType;
+import net.silvertide.player_abilities.api.EffectGrant;
+
+import java.util.List;
 
 public final class RestfulMeditationAbility extends HarvestAbility {
     private static final int COOLDOWN_SECONDS = 1800;
@@ -58,9 +60,13 @@ public final class RestfulMeditationAbility extends HarvestAbility {
 
     @Override
     public void onUseReleased(ServerPlayer player, int level) {
-        int clampedIndex = Math.clamp(level, 1, getMaxLevel()) - 1;
         RestfulMeditationEffect.lockPositionFor(player);
-        player.addEffect(new MobEffectInstance(ReverieEffects.RESTFUL_MEDITATION_EFFECT,
-                EFFECT_DURATION_TICKS_BY_LEVEL[clampedIndex], clampedIndex, false, false, true));
+    }
+
+    @Override
+    public List<EffectGrant> getEffectGrants(int level) {
+        int amplifier = Math.clamp(level, 1, getMaxLevel()) - 1;
+        return List.of(new EffectGrant(ReverieEffects.RESTFUL_MEDITATION_EFFECT,
+                byLevel(level, EFFECT_DURATION_TICKS_BY_LEVEL), amplifier, false, true));
     }
 }

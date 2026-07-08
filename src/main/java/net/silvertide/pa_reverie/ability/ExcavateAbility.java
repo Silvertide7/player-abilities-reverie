@@ -5,8 +5,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.silvertide.pa_reverie.support.ExcavateManager;
+import net.silvertide.pa_reverie.support.ExcavateJob;
 import net.silvertide.pa_reverie.support.ExcavateVolume;
+import net.silvertide.player_abilities.api.AbilityTickJobs;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 import java.util.List;
@@ -51,7 +52,11 @@ public final class ExcavateAbility extends HarvestAbility {
     @Override
     public void onUseReleased(ServerPlayer player, int level) {
         List<BlockPos> positions = computeVolume(player, level);
-        ExcavateManager.start(player, player.serverLevel(), positions, level >= TELEPORT_DROPS_MIN_LEVEL);
+        if (positions.isEmpty()) {
+            return;
+        }
+        ExcavateJob job = new ExcavateJob(player, player.serverLevel(), positions, level >= TELEPORT_DROPS_MIN_LEVEL);
+        AbilityTickJobs.schedule(player, ExcavateJob.PROCESS_INTERVAL_TICKS, serverPlayer -> job.processWave());
     }
 
     private List<BlockPos> computeVolume(ServerPlayer player, int level) {

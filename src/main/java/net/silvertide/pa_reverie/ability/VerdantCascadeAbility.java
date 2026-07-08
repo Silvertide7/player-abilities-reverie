@@ -11,10 +11,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.silvertide.pa_reverie.support.CascadeJob;
 import net.silvertide.pa_reverie.support.CropTargeting;
 import net.silvertide.pa_reverie.support.VerdantCascadeCastData;
-import net.silvertide.pa_reverie.support.VerdantCascadeManager;
 import net.silvertide.player_abilities.api.AbilityAPI;
+import net.silvertide.player_abilities.api.AbilityTickJobs;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class VerdantCascadeAbility extends HarvestAbility {
@@ -75,7 +76,8 @@ public final class VerdantCascadeAbility extends HarvestAbility {
     public void onUseReleased(ServerPlayer player, int level) {
         BlockPos target = resolveCascadeOrigin(player);
         if (target != null) {
-            VerdantCascadeManager.start(player, player.serverLevel(), target, chainMax(player, level), level);
+            CascadeJob job = new CascadeJob(player, player.serverLevel(), target, chainMax(player, level), level);
+            AbilityTickJobs.schedule(player, CascadeJob.PROCESS_INTERVAL_TICKS, serverPlayer -> job.processWave());
         }
     }
 

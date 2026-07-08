@@ -15,6 +15,10 @@ import java.util.List;
 
 public class ExcavateJob {
 
+    public static final int PROCESS_INTERVAL_TICKS = 4;
+    private static final int TARGET_DURATION_TICKS = 40;
+    private static final int TARGET_WAVE_COUNT = TARGET_DURATION_TICKS / PROCESS_INTERVAL_TICKS;
+    private static final int MAX_BLOCKS_PER_WAVE = 16;
     private static final int LEVEL_EVENT_BLOCK_BREAK_PARTICLES_AND_SOUND = 2001;
 
     private final ServerPlayer player;
@@ -30,19 +34,27 @@ public class ExcavateJob {
         this.teleportDropsToPlayer = teleportDropsToPlayer;
     }
 
-    public int totalCount() {
-        return positions.size();
+    public boolean processWave() {
+        if (!isPlayerStillValid()) {
+            return false;
+        }
+        int blocksThisWave = Math.min(MAX_BLOCKS_PER_WAVE,
+                Math.max(1, (positions.size() + TARGET_WAVE_COUNT - 1) / TARGET_WAVE_COUNT));
+        for (int i = 0; i < blocksThisWave && !isDone(); i++) {
+            processOne();
+        }
+        return !isDone();
     }
 
-    public boolean isDone() {
+    private boolean isDone() {
         return nextIndex >= positions.size();
     }
 
-    public boolean isPlayerStillValid() {
+    private boolean isPlayerStillValid() {
         return player.isAlive() && !player.hasDisconnected() && player.serverLevel() == level;
     }
 
-    public void processOne() {
+    private void processOne() {
         if (isDone()) {
             return;
         }

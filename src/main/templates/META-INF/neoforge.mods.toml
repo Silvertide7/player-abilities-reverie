@@ -97,7 +97,7 @@ config="${mod_id}.mixins.json"
 [[dependencies.${mod_id}]]
     modId="player_abilities"
     type="required"
-    versionRange="[1.0.2,)"
+    versionRange="[1.0.3,)"
     ordering="AFTER"
     side="BOTH"
 \n

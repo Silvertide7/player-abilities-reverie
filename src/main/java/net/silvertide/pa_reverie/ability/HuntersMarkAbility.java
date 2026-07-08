@@ -3,7 +3,7 @@ package net.silvertide.pa_reverie.ability;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.silvertide.pa_reverie.registry.ReverieEffects;
-import net.silvertide.pa_reverie.support.ReverieMagicAttributes;
+import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class HuntersMarkAbility extends HarvestAbility {
@@ -28,8 +28,8 @@ public final class HuntersMarkAbility extends HarvestAbility {
     @Override
     public void onUseReleased(ServerPlayer player, int level) {
         int amplifier = Math.clamp(level - 1, 0, getMaxLevel() - 1);
-        int durationTicks = ReverieMagicAttributes.scaledByHarvestPower(player,
-                DURATION_TICKS_BY_LEVEL[Math.clamp(level, 1, getMaxLevel()) - 1]);
+        int durationTicks = AbilityPower.scaled(player,
+                byLevel(level, DURATION_TICKS_BY_LEVEL));
         player.addEffect(new MobEffectInstance(ReverieEffects.HUNTER_EFFECT, durationTicks, amplifier, false, false, true));
     }
 }
