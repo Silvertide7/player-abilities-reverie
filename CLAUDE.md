@@ -16,16 +16,13 @@ A NeoForge mod (Minecraft 1.21.1, NeoForge 21.1.230) implementing the Realms of 
 
 ## Deviations from the original Realms of Reverie spells
 
-Documented substitutions where the original spells depended on systems this mod does not carry:
+Everything is an exact port of the Realms of Reverie source (effects, entities, managers, scanners, recipe type, configs, particles, sounds, formulas), with only these deviations:
 
-- No mana costs (until the framework's Iron's Spellbooks mana compat exists). The original Harvest Spell Power scaling maps to the framework's `player_abilities:ability_power` attribute (radii, capacities, yields, and potencies multiply by it, with the original caps).
-- Deepsight / Fathom's Eye grant vanilla Night Vision (+ Water Breathing for Fathom's Eye) instead of the custom vision effects.
-- Hunter's Mark applies vanilla Glowing to revealed creatures (visible to everyone) instead of caster-only outline rendering.
-- Escape Shaft teleports to the surface with Slow Falling instead of the rise entity; level 3 teleports nearby players too.
-- Transmute recipes are an in-code table in `support/TransmuteRecipes.java` (originally a datapack recipe type); placeholder conversions: copper->iron, iron->gold, gold->diamond.
-- No Quality Food compat in Feast of Life.
-
-Support classes under `support/`, the dry air block, ephemeral food items, and the Tremor Sense client renderer are ported from the Realms of Reverie sources.
+- No mana costs (Iron's Spellbooks pipeline) and no mana-regen attribute modifier on Restful Meditation (Iron's attribute). Everything else about the effects is identical, including Peaceful Reverie's +1 Luck.
+- Iron's `getSpellPower(level, caster)` maps to `HarvestAbility.spellPower(caster, base, perLevel, level)`: the spell's base power scaled by this mod's own `pa_reverie:harvest_spell_power` attribute (ported from the original, multiplier capped at 2.0).
+- Iron's cast pipeline (MagicData/AdditionalCastData) maps to the framework's use pipeline (`AbilityAPI.setUseData`/`getUseData`, `onUseTick`, `onUseReleased`/`onUseComplete`).
+- Cooldowns the user rebalanced after the port: Caisson 600s (source had a 30s test value), Hunter's Mark 300s (source 120s).
+- Farmer's Delight and Quality Food are compileOnly + localRuntime dependencies exactly as in the original (ephemeral foods use FD's Nourishment effect; Feast of Life reads Quality Food quality). Like the original, these are hard runtime requirements in practice.
 
 ## Build & run
 

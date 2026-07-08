@@ -8,6 +8,12 @@ public abstract class HarvestAbility extends ActiveAbility {
     protected static final ResourceLocation HARVEST_CATEGORY = PAReverie.id("harvest");
     protected static final int TICKS_PER_SECOND = 20;
 
+    protected static float spellPower(net.minecraft.world.entity.LivingEntity caster, int baseSpellPower,
+                                      int spellPowerPerLevel, int level) {
+        return (float) net.silvertide.pa_reverie.support.ReverieMagicAttributes.scaledByHarvestPower(caster,
+                (double) (baseSpellPower + spellPowerPerLevel * (level - 1)));
+    }
+
     @Override
     public ResourceLocation getCategory() {
         return HARVEST_CATEGORY;

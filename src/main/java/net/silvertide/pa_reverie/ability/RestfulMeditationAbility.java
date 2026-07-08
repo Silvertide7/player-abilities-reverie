@@ -2,19 +2,18 @@ package net.silvertide.pa_reverie.ability;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.phys.Vec3;
-import net.silvertide.player_abilities.api.AbilityAPI;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.silvertide.pa_reverie.effect.RestfulMeditationEffect;
+import net.silvertide.pa_reverie.registry.ReverieEffects;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class RestfulMeditationAbility extends HarvestAbility {
     private static final int COOLDOWN_SECONDS = 1800;
-    private static final double MOVEMENT_BREAK_THRESHOLD_SQ = 0.25;
-    private static final float HEAL_PER_PULSE = 1.0f;
-    private static final int FOOD_PER_PULSE = 1;
-    private static final float SATURATION_PER_PULSE = 1.0f;
-    private static final int FULL_FOOD_LEVEL = 20;
+    private static final int[] EFFECT_DURATION_TICKS_BY_LEVEL = {600, 900, 1200};
+    private static final int CHANNEL_PARTICLE_TICK_INTERVAL = 10;
+    private static final int CHANNEL_PARTICLE_COUNT = 2;
+    private static final double CHANNEL_PARTICLE_HORIZONTAL_SPREAD = 1.5;
+    private static final double CHANNEL_PARTICLE_VERTICAL_OFFSET_ABOVE_HEAD = 0.5;
 
     @Override
     public AbilityUseType getUseType() {
@@ -37,41 +36,31 @@ public final class RestfulMeditationAbility extends HarvestAbility {
     }
 
     @Override
-    public int getEffectDurationTicks(int level) {
-        return byLevel(level, 600, 900, 1200);
+    public boolean canUse(ServerPlayer player, int level) {
+        RestfulMeditationEffect.clearLockFor(player);
+        return true;
+    }
+
+    @Override
+    public void onUseStart(ServerPlayer player, int level) {
+        player.level().playSound(null, player.blockPosition(),
+                net.minecraft.sounds.SoundEvents.AMETHYST_BLOCK_RESONATE, net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, 1.0f);
     }
 
     @Override
     public void onUseTick(ServerPlayer player, int level, int elapsedTicks, int totalTicks) {
-        if (elapsedTicks % 10 == 0) {
+        if (player.tickCount % CHANNEL_PARTICLE_TICK_INTERVAL == 0) {
             player.serverLevel().sendParticles(ParticleTypes.HAPPY_VILLAGER,
-                    player.getX(), player.getY() + player.getBbHeight() + 0.5, player.getZ(), 2, 1.5, 0.2, 1.5, 0.0);
+                    player.getX(), player.getY() + player.getBbHeight() + CHANNEL_PARTICLE_VERTICAL_OFFSET_ABOVE_HEAD, player.getZ(),
+                    CHANNEL_PARTICLE_COUNT, CHANNEL_PARTICLE_HORIZONTAL_SPREAD, 0.0, CHANNEL_PARTICLE_HORIZONTAL_SPREAD, 0.0);
         }
     }
 
     @Override
-    public void onEffectStart(ServerPlayer player, int level) {
-        AbilityAPI.setEffectData(player, this, player.position());
-    }
-
-    @Override
-    public void onEffectTick(ServerPlayer player, int level, int remainingTicks) {
-        if (AbilityAPI.getEffectData(player, this) instanceof Vec3 lockedPosition
-                && player.position().distanceToSqr(lockedPosition) > MOVEMENT_BREAK_THRESHOLD_SQ) {
-            AbilityAPI.removeEffect(player, this);
-            return;
-        }
-        if (remainingTicks % byLevel(level, 40, 30, 20) == 0 && player.getHealth() < player.getMaxHealth()) {
-            player.heal(HEAL_PER_PULSE);
-        }
-        if (remainingTicks % byLevel(level, 60, 45, 30) == 0 && player.getFoodData().getFoodLevel() < FULL_FOOD_LEVEL) {
-            player.getFoodData().eat(FOOD_PER_PULSE, SATURATION_PER_PULSE);
-        }
-    }
-
-    @Override
-    public void onEffectEnd(ServerPlayer player, int level, boolean expired) {
-        player.level().playSound(null, player.blockPosition(),
-                SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.5f, 1.2f);
+    public void onUseReleased(ServerPlayer player, int level) {
+        int clampedIndex = Math.clamp(level, 1, getMaxLevel()) - 1;
+        RestfulMeditationEffect.lockPositionFor(player);
+        player.addEffect(new MobEffectInstance(ReverieEffects.RESTFUL_MEDITATION_EFFECT,
+                EFFECT_DURATION_TICKS_BY_LEVEL[clampedIndex], clampedIndex, false, false, true));
     }
 }

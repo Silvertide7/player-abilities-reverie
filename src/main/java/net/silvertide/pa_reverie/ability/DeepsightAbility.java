@@ -2,17 +2,13 @@ package net.silvertide.pa_reverie.ability;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.silvertide.pa_reverie.effect.DeepSightEffect;
+import net.silvertide.pa_reverie.registry.ReverieEffects;
 import net.silvertide.player_abilities.api.AbilityUseType;
-import net.silvertide.player_abilities.api.EffectGrant;
-
-import java.util.List;
 
 public final class DeepsightAbility extends HarvestAbility {
     private static final int COOLDOWN_SECONDS = 300;
-    private static final int DEPTH_BELOW_SURFACE_REQUIRED = 64;
 
     @Override
     public AbilityUseType getUseType() {
@@ -31,11 +27,7 @@ public final class DeepsightAbility extends HarvestAbility {
 
     @Override
     public boolean canUse(ServerPlayer player, int level) {
-        if (player.level().dimension() == Level.NETHER) {
-            return true;
-        }
-        int surfaceY = player.serverLevel().getHeight(Heightmap.Types.WORLD_SURFACE, player.getBlockX(), player.getBlockZ());
-        return player.getY() < surfaceY - DEPTH_BELOW_SURFACE_REQUIRED;
+        return DeepSightEffect.isSufficientlyUnderground(player.level(), player);
     }
 
     @Override
@@ -44,7 +36,10 @@ public final class DeepsightAbility extends HarvestAbility {
     }
 
     @Override
-    public List<EffectGrant> getEffectGrants(int level) {
-        return List.of(new EffectGrant(MobEffects.NIGHT_VISION, byLevel(level, 3600, 7200, 18000), 0));
+    public void onUseReleased(ServerPlayer player, int level) {
+        if (DeepSightEffect.isSufficientlyUnderground(player.level(), player)) {
+            player.addEffect(new MobEffectInstance(ReverieEffects.DEEP_SIGHT,
+                    byLevel(level, 3600, 7200, 18000), level - 1, false, false, true));
+        }
     }
 }

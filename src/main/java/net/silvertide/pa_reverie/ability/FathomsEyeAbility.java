@@ -3,14 +3,13 @@ package net.silvertide.pa_reverie.ability;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.silvertide.pa_reverie.registry.ReverieEffects;
 import net.silvertide.player_abilities.api.AbilityUseType;
-import net.silvertide.player_abilities.api.EffectGrant;
-
-import java.util.List;
 
 public final class FathomsEyeAbility extends HarvestAbility {
     private static final int COOLDOWN_SECONDS = 300;
+
     @Override
     public AbilityUseType getUseType() {
         return AbilityUseType.CHARGED;
@@ -37,8 +36,10 @@ public final class FathomsEyeAbility extends HarvestAbility {
     }
 
     @Override
-    public List<EffectGrant> getEffectGrants(int level) {
-        return List.of(new EffectGrant(MobEffects.NIGHT_VISION, byLevel(level, 3600, 7200, 18000), 0),
-                new EffectGrant(MobEffects.WATER_BREATHING, byLevel(level, 3600, 7200, 18000), 0));
+    public void onUseReleased(ServerPlayer player, int level) {
+        if (player.isEyeInFluid(FluidTags.WATER)) {
+            player.addEffect(new MobEffectInstance(ReverieEffects.FATHOMS_EYE,
+                    byLevel(level, 3600, 7200, 18000), level - 1, false, false, true));
+        }
     }
 }

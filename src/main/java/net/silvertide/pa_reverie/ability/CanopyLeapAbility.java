@@ -75,23 +75,23 @@ public final class CanopyLeapAbility extends HarvestAbility {
             return;
         }
         Vec3 origin = player.position();
-        player.serverLevel().sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR,
-                origin.x, origin.y + 1, origin.z, 24, 0.3, 0.5, 0.3, 0.0);
-        player.level().playSound(null, BlockPos.containing(origin),
-                SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 0.7f, 1.3f);
         player.stopRiding();
         player.teleportTo(player.serverLevel(), destination.x, destination.y, destination.z,
                 player.getYRot(), player.getXRot());
         player.resetFallDistance();
-        player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0));
+        player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 60, 0, false, false, true));
+        player.serverLevel().sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR,
+                origin.x, origin.y + 1, origin.z, 24, 0.3, 0.5, 0.3, 0.0);
         player.serverLevel().sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR,
                 destination.x, destination.y, destination.z, 24, 0.4, 0.4, 0.4, 0.0);
-        player.level().playSound(null, BlockPos.containing(destination),
+        player.level().playSound(null, origin.x, origin.y, origin.z,
+                SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 0.7f, 1.3f);
+        player.level().playSound(null, destination.x, destination.y, destination.z,
                 SoundEvents.AZALEA_LEAVES_FALL, SoundSource.PLAYERS, 1.0f, 1.0f);
     }
 
     private BlockPos raycastTree(ServerPlayer player, int level) {
-        int reach = Mth.clamp((int) Math.round((16 + 8 * (level - 1)) * AbilityAPI.getAbilityPower(player)), 16, 64);
+        int reach = Mth.clamp(Math.round(spellPower(player, 16, 8, level)), 16, 64);
         Vec3 eyePosition = player.getEyePosition();
         Vec3 reachEnd = eyePosition.add(player.getViewVector(1.0f).scale(reach));
         BlockHitResult hit = player.level().clip(new ClipContext(eyePosition, reachEnd,
