@@ -1,4 +1,3 @@
-1.0.0
+1.0.1
 ---
-- Full Release
-- Fully implement abilities from other mod to use new API
+- Fix some implementations from transferring over from old mod.
