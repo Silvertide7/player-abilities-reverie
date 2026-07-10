@@ -12,6 +12,7 @@ import net.silvertide.pa_reverie.ability.EscapeShaftAbility;
 import net.silvertide.pa_reverie.ability.ExcavateAbility;
 import net.silvertide.pa_reverie.ability.FathomsEyeAbility;
 import net.silvertide.pa_reverie.ability.FeastOfLifeAbility;
+import net.silvertide.pa_reverie.ability.GuardianAngelAbility;
 import net.silvertide.pa_reverie.ability.HuntersMarkAbility;
 import net.silvertide.pa_reverie.ability.MendAbility;
 import net.silvertide.pa_reverie.ability.PeacefulReverieAbility;
@@ -47,6 +48,8 @@ public final class ReverieAbilities {
             ABILITIES.register("escape_shaft", EscapeShaftAbility::new);
     public static final DeferredHolder<Ability, ExcavateAbility> EXCAVATE =
             ABILITIES.register("excavate", ExcavateAbility::new);
+    public static final DeferredHolder<Ability, GuardianAngelAbility> GUARDIAN_ANGEL =
+            ABILITIES.register("guardian_angel", GuardianAngelAbility::new);
     public static final DeferredHolder<Ability, HuntersMarkAbility> HUNTERS_MARK =
             ABILITIES.register("hunters_mark", HuntersMarkAbility::new);
     public static final DeferredHolder<Ability, PeacefulReverieAbility> PEACEFUL_REVERIE =
