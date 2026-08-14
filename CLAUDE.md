@@ -1,6 +1,6 @@
 # Player Abilities: Reverie
 
-A NeoForge mod (Minecraft 1.21.1, NeoForge 21.1.230) implementing the Realms of Reverie ability set on top of the Player Abilities framework mod. Ships the 18 Reverie abilities (see `claude_reference/reverie_port_specs.md` in the player_abilities repo for exact specs) and serves as the public example of building against the Player Abilities API.
+A NeoForge mod (Minecraft 1.21.1, NeoForge 21.1.230) implementing the Realms of Reverie ability set on top of the Player Abilities framework mod. Ships the 19 Reverie abilities (see `claude_reference/reverie_port_specs.md` in the player_abilities repo for exact specs) and serves as the public example of building against the Player Abilities API.
 
 ## Project info
 
