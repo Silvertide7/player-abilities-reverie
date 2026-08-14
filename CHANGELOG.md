@@ -1,3 +1,3 @@
-1.0.2
+1.0.3
 ---
-- Fix some implementations from transferring over from old mod.
+- Remove Guardian Angel - moving to a new pack for Mortal Boons
