@@ -10,7 +10,7 @@ import net.silvertide.player_abilities.api.EffectGrant;
 import java.util.List;
 
 public final class RestfulMeditationAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 1800;
+    private static final int[] COOLDOWN_SECONDS_BY_LEVEL = {900, 720, 600};
     private static final int[] EFFECT_DURATION_TICKS_BY_LEVEL = {600, 900, 1200};
     private static final int CHANNEL_PARTICLE_TICK_INTERVAL = 10;
     private static final int CHANNEL_PARTICLE_COUNT = 2;
@@ -29,7 +29,7 @@ public final class RestfulMeditationAbility extends HarvestAbility {
 
     @Override
     public int getCooldownTicks(int level) {
-        return COOLDOWN_SECONDS * TICKS_PER_SECOND;
+        return byLevel(level, COOLDOWN_SECONDS_BY_LEVEL) * TICKS_PER_SECOND;
     }
 
     @Override

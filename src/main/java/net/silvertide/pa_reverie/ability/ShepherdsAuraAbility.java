@@ -7,7 +7,7 @@ import net.silvertide.player_abilities.api.EffectGrant;
 import java.util.List;
 
 public final class ShepherdsAuraAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 1800;
+    private static final int COOLDOWN_SECONDS = 600;
     private static final int[] DURATION_TICKS_BY_LEVEL = {1200, 1800, 2400};
 
     @Override

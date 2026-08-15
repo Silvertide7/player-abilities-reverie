@@ -19,7 +19,7 @@ import net.silvertide.player_abilities.api.AbilityTickJobs;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class VerdantCascadeAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 3600;
+    private static final int COOLDOWN_SECONDS = 1800;
     private static final int BASE_SPELL_POWER = 100;
     private static final int SPELL_POWER_PER_LEVEL = 100;
     private static final int MIN_CHAIN = 100;

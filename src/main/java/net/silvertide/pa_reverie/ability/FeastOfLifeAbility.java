@@ -17,7 +17,7 @@ import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class FeastOfLifeAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 1200;
+    private static final int COOLDOWN_SECONDS = 300;
     private static final float MAX_ABSORPTION = 40.0f;
     private static final float[] POTENCY_BY_LEVEL = {1.0f, 1.35f, 1.7f};
     private static final float[] EFFECT_DURATION_MULTIPLIER_BY_LEVEL = {1.2f, 1.3f, 1.4f};

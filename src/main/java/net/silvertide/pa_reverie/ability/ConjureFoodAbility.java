@@ -10,7 +10,7 @@ import net.silvertide.pa_reverie.item.EphemeralFoodItem;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class ConjureFoodAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 1800;
+    private static final int COOLDOWN_SECONDS = 600;
     private static final int CONJURE_PARTICLE_COUNT = 15;
 
     @Override

@@ -17,7 +17,7 @@ import net.silvertide.player_abilities.api.AbilityAPI;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class TremorSenseAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 2400;
+    private static final int COOLDOWN_SECONDS = 600;
     private static final int BASE_SPELL_POWER = 10;
     private static final int SPELL_POWER_PER_LEVEL = 5;
     private static final int MIN_RADIUS = 4;

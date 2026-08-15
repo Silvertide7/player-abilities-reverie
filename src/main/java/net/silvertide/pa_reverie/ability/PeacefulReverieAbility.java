@@ -14,7 +14,7 @@ import net.silvertide.pa_reverie.registry.ReverieEffects;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class PeacefulReverieAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 1800;
+    private static final int COOLDOWN_SECONDS = 600;
     private static final int[] EFFECT_DURATION_TICKS_BY_LEVEL = {6000, 8400, 12000};
     private static final int REQUIRED_TOTAL_WATER_SOURCES = 30;
     private static final int REQUIRED_TOP_LAYER_SOURCES = 10;

@@ -18,7 +18,7 @@ import net.silvertide.player_abilities.api.AbilityUseType;
 import java.util.List;
 
 public final class CaissonAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 600;
+    private static final int COOLDOWN_SECONDS = 300;
     private static final int CAST_TIME_TICKS = 40;
     private static final int BASE_SPELL_POWER = 3;
     private static final int SPELL_POWER_PER_LEVEL = 3;

@@ -22,7 +22,7 @@ import net.silvertide.player_abilities.api.AbilityUseType;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class WoodsongAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 2400;
+    private static final int COOLDOWN_SECONDS = 900;
     private static final int BASE_SPELL_POWER = 8;
     private static final int SPELL_POWER_PER_LEVEL = 6;
     private static final int MIN_RADIUS = 4;
