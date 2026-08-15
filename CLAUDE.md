@@ -1,13 +1,13 @@
 # Player Abilities: Reverie
 
-A NeoForge mod (Minecraft 1.21.1, NeoForge 21.1.230) implementing the Realms of Reverie ability set on top of the Player Abilities framework mod. Ships the 19 Reverie abilities (see `claude_reference/reverie_port_specs.md` in the player_abilities repo for exact specs) and serves as the public example of building against the Player Abilities API.
+A Forge mod (Minecraft 1.20.1, Forge 47.4.10) implementing the Realms of Reverie ability set on top of the Player Abilities framework mod. Ships the 18 Reverie abilities (see `claude_reference/reverie_port_specs.md` in the player_abilities repo for exact specs) and serves as the public example of building against the Player Abilities API.
 
 ## Project info
 
 - Mod id: `pa_reverie`
 - Base package / group: `net.silvertide.pa_reverie`
 - Main mod class: `src/main/java/net/silvertide/pa_reverie/PAReverie.java`
-- Depends on `player_abilities` (required, declared in mods.toml). The framework jar lives in `libs/` and is referenced from `build.gradle`; swap to the CurseMaven coordinate (placeholder comment in `build.gradle`) once Player Abilities is published. When the framework version bumps, drop the new jar into `libs/` and update the one path.
+- Depends on `player_abilities` (required, declared in `src/main/resources/META-INF/mods.toml`). Pulled from CurseMaven via `player_abilities_version` (a CurseForge file id) in `gradle.properties`; bump that id to move to a new framework build.
 
 ## Conventions
 
@@ -21,8 +21,23 @@ Everything is an exact port of the Realms of Reverie source (effects, entities, 
 - No mana costs (Iron's Spellbooks pipeline) and no mana-regen attribute modifier on Restful Meditation (Iron's attribute). Everything else about the effects is identical, including Peaceful Reverie's +1 Luck.
 - Iron's `getSpellPower(level, caster)` maps to `HarvestAbility.spellPower(caster, base, perLevel, level)`: the spell's base power scaled by the framework's `player_abilities:ability_power` attribute via `support/AbilityPower` (multiplier capped at 2.0).
 - Iron's cast pipeline (MagicData/AdditionalCastData) maps to the framework's use pipeline (`AbilityAPI.setUseData`/`getUseData`, `onUseTick`, `onUseReleased`/`onUseComplete`).
-- Cooldowns the user rebalanced after the port: Caisson 600s (source had a 30s test value), Hunter's Mark 300s (source 120s).
-- Farmer's Delight and Quality Food are compileOnly + localRuntime at build time (ephemeral foods use FD's Nourishment effect; Feast of Life reads Quality Food quality). Both are optional at runtime: Farmer's Delight is declared `type="optional"` and Quality Food is untracked in mods.toml; each is reached only through a `ModList.isLoaded`-gated bridge (`FarmersDelightCompat`/`QualityFoodCompat`) whose real dependency reference lives in a nested class touched only when the mod is present, so the pack runs standalone.
+- Cooldowns were rebalanced by the user after the port and no longer match the Realms of Reverie source. Current values, in minutes (per level where the ability scales): Canopy Leap 4/3/2, Caisson 5, Feast of Life 5, Hunter's Mark 5, Excavate 8/6/4, Conjure Food 10, Peaceful Reverie 10, Shepherd's Aura 10, Tremor Sense 10, Restful Meditation 15/12/10, Woodsong 15, Mend 30, Rain Dance 30, Verdant Cascade 30, Deepsight 5/8/15, Fathom's Eye 5/8/15, Escape Shaft 120/90/60. Deepsight and Fathom's Eye rise with level because their effect duration scales too; Transmute takes its cooldown from the matched recipe.
+- Farmer's Delight and Quality Food are compileOnly + localRuntime at build time (ephemeral foods use FD's Nourishment effect; Feast of Life reads Quality Food quality). Both are optional at runtime: Farmer's Delight is declared `mandatory=false` and Quality Food is untracked in mods.toml; each is reached only through a `ModList.isLoaded`-gated bridge (`FarmersDelightCompat`/`QualityFoodCompat`) whose real dependency reference lives in a nested class touched only when the mod is present, so the pack runs standalone.
+
+## 1.20.1 port notes
+
+Ported from NeoForge 1.21.1. Places where 1.20.1 has no equivalent API, and what was done instead:
+
+- Data components do not exist. Ephemeral food expiry is stored as an `ExpiresAtGameTime` long on the stack's NBT tag (`EphemeralFoodItem`).
+- `MobEffect.applyEffectTick` returns `void` on 1.20.1, so it cannot signal "end this effect". Peaceful Reverie and Restful Meditation broke on movement via a `false` return; they now queue the removal with `MinecraftServer.tell(new TickTask(...))`, which drains after `tickChildren` and so lands outside `LivingEntity.tickEffects`'s iteration. Do not use `MinecraftServer.execute` here: on the server thread outside `doRunTask`, `scheduleExecutables()` is false and `execute` runs the task inline, which mutates `activeEffects` mid-iteration (vanilla catches the `ConcurrentModificationException` but the remaining effects silently lose that tick).
+- The 1.21 `false` return also routed through the expiry path, firing `MobEffectEvent.Expired`; `removeEffect` fires `MobEffectEvent.Remove` instead, so the break path calls `onReverieEnded`/`onMeditationEnded` explicitly, guarded on `removeEffect`'s return so it cannot double-fire alongside natural expiry.
+- `MobEffect.onEffectStarted` does not exist. `VisionEffect` seeds its start-duration map on the first `applyEffectTick` instead.
+- `LiquidBlockContainer.canPlaceLiquid` has no player parameter. `DryAirBlock` returned `player != null` (letting a bucket fill it while blocking natural flow); it now returns `false` so Caisson's air pocket still resists water.
+- Recipes predate codecs: `TransmuteRecipe.Serializer` hand-writes `fromJson`/`fromNetwork`/`toNetwork`, and the recipe carries its own id (no `RecipeHolder`). The `result` field now uses the 1.20.1 `{"item": ..., "count": ...}` form rather than 1.21's `{"id": ...}`.
+- Networking uses a Forge `SimpleChannel` (`ReverieNetworking`) instead of payload registration; the 1.21 `ByteBufCodecs.list(max)` bounds are preserved as explicit decode-side range checks.
+- Block tags live under `data/pa_reverie/tags/blocks/` (plural), and `#c:ores` became `#forge:ores`.
+- `Math.clamp` is Java 21; all uses are `Mth.clamp`.
+- Attribute modifiers are UUID-keyed, so Peaceful Reverie's +1 Luck uses a fixed UUID constant.
 
 ## Build & run
 

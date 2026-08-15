@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
@@ -200,7 +201,7 @@ public final class RainDanceAbility extends HarvestAbility {
     }
 
     private int fieldRadius(ServerPlayer player, int level) {
-        return Math.clamp(Math.round(spellPower(player, BASE_SPELL_POWER, SPELL_POWER_PER_LEVEL, level)),
+        return Mth.clamp(Math.round(spellPower(player, BASE_SPELL_POWER, SPELL_POWER_PER_LEVEL, level)),
                 MIN_RADIUS, MAX_RADIUS);
     }
 

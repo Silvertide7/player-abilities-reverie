@@ -1,6 +1,5 @@
 package net.silvertide.pa_reverie.effect;
 
-import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -17,54 +16,39 @@ public abstract class VisionEffect extends MobEffect {
     protected static final float INTENSITY_PER_FADE_TICK = 1.0f / INTENSITY_FADE_TICKS;
 
     private final Map<LivingEntity, Integer> entityStartDurations = new WeakHashMap<>();
+    private final Map<LivingEntity, Integer> entityPreviousDurations = new WeakHashMap<>();
 
     protected VisionEffect(MobEffectCategory category, int displayColor) {
         super(category, displayColor);
     }
 
-    protected abstract Holder<MobEffect> getEffectHolder();
-
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         return true;
     }
 
     @Override
-    public boolean applyEffectTick(@NotNull LivingEntity entity, int amplifier) {
-        if (!entity.level().isClientSide) {
-            return true;
-        }
-        MobEffectInstance instance = entity.getEffect(getEffectHolder());
-        if (instance != null) {
-            int duration = instance.getDuration();
-            Integer recorded = entityStartDurations.get(entity);
-            if (recorded == null || duration > recorded) {
-                entityStartDurations.put(entity, duration);
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void onEffectStarted(@NotNull LivingEntity entity, int amplifier) {
+    public void applyEffectTick(@NotNull LivingEntity entity, int amplifier) {
         if (!entity.level().isClientSide) {
             return;
         }
-        MobEffectInstance instance = entity.getEffect(getEffectHolder());
-        if (instance != null) {
-            entityStartDurations.put(entity, instance.getDuration());
+        MobEffectInstance instance = entity.getEffect(this);
+        if (instance == null) {
+            return;
+        }
+        int duration = instance.getDuration();
+        Integer previousDuration = entityPreviousDurations.put(entity, duration);
+        if (previousDuration == null || duration > previousDuration) {
+            entityStartDurations.put(entity, duration);
         }
     }
 
-    public static float getIntensity(Player player, Holder<MobEffect> effectHolder, float partialTicks) {
-        MobEffectInstance instance = player.getEffect(effectHolder);
+    public static float getIntensity(Player player, MobEffect effectType, float partialTicks) {
+        MobEffectInstance instance = player.getEffect(effectType);
         if (instance == null) {
             return 0.0F;
         }
-        if (instance.isInfiniteDuration()) {
-            return 1.0F;
-        }
-        VisionEffect effect = (VisionEffect) instance.getEffect().value();
+        VisionEffect effect = (VisionEffect) instance.getEffect();
         int duration = instance.getDuration();
         int maxDuration = effect.entityStartDurations.getOrDefault(player, duration);
         if (duration > maxDuration) {

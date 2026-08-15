@@ -8,7 +8,7 @@ import net.silvertide.pa_reverie.registry.ReverieEffects;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class FathomsEyeAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 300;
+    private static final int[] COOLDOWN_SECONDS_BY_LEVEL = {300, 480, 900};
 
     @Override
     public AbilityUseType getUseType() {
@@ -22,7 +22,7 @@ public final class FathomsEyeAbility extends HarvestAbility {
 
     @Override
     public int getCooldownTicks(int level) {
-        return COOLDOWN_SECONDS * TICKS_PER_SECOND;
+        return byLevel(level, COOLDOWN_SECONDS_BY_LEVEL) * TICKS_PER_SECOND;
     }
 
     @Override
@@ -38,7 +38,7 @@ public final class FathomsEyeAbility extends HarvestAbility {
     @Override
     public void onUseReleased(ServerPlayer player, int level) {
         if (player.isEyeInFluid(FluidTags.WATER)) {
-            player.addEffect(new MobEffectInstance(ReverieEffects.FATHOMS_EYE,
+            player.addEffect(new MobEffectInstance(ReverieEffects.FATHOMS_EYE.get(),
                     byLevel(level, 3600, 7200, 18000), level - 1, false, false, true));
         }
     }

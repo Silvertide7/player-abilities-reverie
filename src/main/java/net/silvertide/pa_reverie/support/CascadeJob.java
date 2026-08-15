@@ -10,9 +10,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.BlockSnapshot;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.level.BlockEvent;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -137,9 +137,9 @@ public class CascadeJob {
 
         BlockState placedAgainst = level.getBlockState(pos.below());
         BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(snapshot, placedAgainst, player);
-        NeoForge.EVENT_BUS.post(placeEvent);
+        MinecraftForge.EVENT_BUS.post(placeEvent);
         if (placeEvent.isCanceled()) {
-            snapshot.restore(Block.UPDATE_ALL);
+            snapshot.restore(true);
             return false;
         }
 
@@ -160,7 +160,7 @@ public class CascadeJob {
 
     private boolean fireBreakAllowed(BlockPos pos, BlockState state) {
         BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(level, pos, state, player);
-        NeoForge.EVENT_BUS.post(breakEvent);
+        MinecraftForge.EVENT_BUS.post(breakEvent);
         return !breakEvent.isCanceled();
     }
 

@@ -1,19 +1,15 @@
 package net.silvertide.pa_reverie.network;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.silvertide.pa_reverie.PAReverie;
-import org.jetbrains.annotations.NotNull;
+import io.netty.handler.codec.DecoderException;
+import net.minecraft.network.FriendlyByteBuf;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public record HunterHighlightPacket(
         List<Integer> entityIds,
         int durationTicks
-) implements CustomPacketPayload {
+) {
 
     private static final int MAX_ENCODED_ENTITIES = 256;
 
@@ -21,20 +17,23 @@ public record HunterHighlightPacket(
         entityIds = List.copyOf(entityIds);
     }
 
-    public static final CustomPacketPayload.Type<HunterHighlightPacket> TYPE =
-            new CustomPacketPayload.Type<>(
-                    ResourceLocation.fromNamespaceAndPath(PAReverie.MOD_ID, "hunter_highlight")
-            );
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeVarInt(entityIds.size());
+        for (int entityId : entityIds) {
+            buf.writeVarInt(entityId);
+        }
+        buf.writeVarInt(durationTicks);
+    }
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, HunterHighlightPacket> STREAM_CODEC =
-            StreamCodec.composite(
-                    ByteBufCodecs.VAR_INT.apply(ByteBufCodecs.list(MAX_ENCODED_ENTITIES)), HunterHighlightPacket::entityIds,
-                    ByteBufCodecs.VAR_INT, HunterHighlightPacket::durationTicks,
-                    HunterHighlightPacket::new
-            );
-
-    @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public static HunterHighlightPacket decode(FriendlyByteBuf buf) {
+        int count = buf.readVarInt();
+        if (count < 0 || count > MAX_ENCODED_ENTITIES) {
+            throw new DecoderException("Hunter highlight entity count out of range: " + count);
+        }
+        List<Integer> entityIds = new ArrayList<>(count);
+        for (int index = 0; index < count; index++) {
+            entityIds.add(buf.readVarInt());
+        }
+        return new HunterHighlightPacket(entityIds, buf.readVarInt());
     }
 }

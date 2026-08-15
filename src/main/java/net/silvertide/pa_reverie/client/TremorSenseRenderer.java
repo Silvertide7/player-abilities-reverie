@@ -5,15 +5,15 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.silvertide.pa_reverie.PAReverie;
 import org.joml.Matrix4f;
 
-@EventBusSubscriber(modid = PAReverie.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = PAReverie.MOD_ID, value = Dist.CLIENT)
 public final class TremorSenseRenderer {
 
     private static final float RIPPLE_SPEED_BLOCKS_PER_SECOND = 24f;
@@ -50,7 +50,7 @@ public final class TremorSenseRenderer {
         }
 
         long gameTick = minecraft.level.getGameTime();
-        float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        float partialTick = event.getPartialTick();
         float elapsedSeconds = ((gameTick - active.startGameTick()) + partialTick) / 20f;
         float totalSeconds = (active.endGameTick() - active.startGameTick()) / 20f;
         float endingFadeStartSeconds = totalSeconds * (1f - ENDING_FADE_PORTION);

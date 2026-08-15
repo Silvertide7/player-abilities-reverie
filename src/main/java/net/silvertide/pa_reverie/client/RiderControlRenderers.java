@@ -4,16 +4,15 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.silvertide.pa_reverie.PAReverie;
 import net.silvertide.pa_reverie.registry.ReverieEntities;
 import org.jetbrains.annotations.NotNull;
 
-@EventBusSubscriber(modid = PAReverie.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-@SuppressWarnings("removal")
+@Mod.EventBusSubscriber(modid = PAReverie.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class RiderControlRenderers {
 
     private RiderControlRenderers() {}
@@ -30,7 +29,7 @@ public final class RiderControlRenderers {
 
         @Override
         public @NotNull ResourceLocation getTextureLocation(@NotNull T entity) {
-            return ResourceLocation.fromNamespaceAndPath(PAReverie.MOD_ID, "textures/entity/empty.png");
+            return new ResourceLocation(PAReverie.MOD_ID, "textures/entity/empty.png");
         }
     }
 }

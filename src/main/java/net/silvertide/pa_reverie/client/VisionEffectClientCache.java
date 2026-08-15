@@ -4,16 +4,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.TickEvent;
 import net.silvertide.pa_reverie.PAReverie;
 import net.silvertide.pa_reverie.effect.DeepSightEffect;
 import net.silvertide.pa_reverie.effect.FathomsEyeEffect;
 import net.silvertide.pa_reverie.registry.ReverieEffects;
 
-@EventBusSubscriber(modid = PAReverie.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = PAReverie.MOD_ID, value = Dist.CLIENT)
 public final class VisionEffectClientCache {
 
     private static boolean deepSightGateOpen = false;
@@ -40,7 +40,10 @@ public final class VisionEffectClientCache {
     }
 
     @SubscribeEvent
-    public static void onClientTickPost(ClientTickEvent.Post event) {
+    public static void onClientTickPost(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
         Player player = Minecraft.getInstance().player;
         if (player == null) {
             clearAll();
@@ -51,7 +54,7 @@ public final class VisionEffectClientCache {
     }
 
     private static void recomputeDeepSightGate(Player player) {
-        MobEffectInstance effect = player.getEffect(ReverieEffects.DEEP_SIGHT);
+        MobEffectInstance effect = player.getEffect(ReverieEffects.DEEP_SIGHT.get());
         if (effect == null || !DeepSightEffect.isSufficientlyUnderground(player.level(), player)) {
             deepSightGateOpen = false;
             deepSightTickEndIntensity = 0.0f;
@@ -62,7 +65,7 @@ public final class VisionEffectClientCache {
     }
 
     private static void recomputeFathomsEyeGate(Player player) {
-        MobEffectInstance effect = player.getEffect(ReverieEffects.FATHOMS_EYE);
+        MobEffectInstance effect = player.getEffect(ReverieEffects.FATHOMS_EYE.get());
         if (effect == null || !player.isEyeInFluid(FluidTags.WATER)) {
             fathomsEyeGateOpen = false;
             fathomsEyeTickEndIntensity = 0.0f;

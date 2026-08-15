@@ -13,7 +13,7 @@ public final class TremorScanner {
 
     public static final TagKey<Block> TARGETS = TagKey.create(
             Registries.BLOCK,
-            ResourceLocation.fromNamespaceAndPath(PAReverie.MOD_ID, "tremor_sense_targets")
+            new ResourceLocation(PAReverie.MOD_ID, "tremor_sense_targets")
     );
 
     private TremorScanner() {}

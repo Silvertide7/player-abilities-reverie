@@ -1,6 +1,7 @@
 package net.silvertide.pa_reverie.effect;
 
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.Entity;
@@ -11,7 +12,7 @@ import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.silvertide.pa_reverie.network.ReverieNetworking;
 import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.pa_reverie.network.HunterHighlightPacket;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +37,7 @@ public class HunterEffect extends MobEffect {
     }
 
     public static int scanRadiusForAmplifier(int amplifier) {
-        return SCAN_RADIUS_BY_AMPLIFIER[Math.clamp(amplifier, 0, SCAN_RADIUS_BY_AMPLIFIER.length - 1)];
+        return SCAN_RADIUS_BY_AMPLIFIER[Mth.clamp(amplifier, 0, SCAN_RADIUS_BY_AMPLIFIER.length - 1)];
     }
 
     private static int scaledScanRadius(ServerPlayer caster, int amplifier) {
@@ -45,7 +46,7 @@ public class HunterEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(@NotNull LivingEntity livingEntity, int amplifier) {
+    public void applyEffectTick(@NotNull LivingEntity livingEntity, int amplifier) {
         if (livingEntity instanceof ServerPlayer caster) {
             AABB scanBox = caster.getBoundingBox().inflate(scaledScanRadius(caster, amplifier));
             List<Integer> targetIds = caster.serverLevel()
@@ -55,14 +56,13 @@ public class HunterEffect extends MobEffect {
                     .map(Entity::getId)
                     .toList();
             if (!targetIds.isEmpty()) {
-                PacketDistributor.sendToPlayer(caster, new HunterHighlightPacket(targetIds, HIGHLIGHT_TTL_TICKS));
+                ReverieNetworking.sendToPlayer(caster, new HunterHighlightPacket(targetIds, HIGHLIGHT_TTL_TICKS));
             }
         }
-        return true;
     }
 
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         return duration % SCAN_INTERVAL_TICKS == 0;
     }
 

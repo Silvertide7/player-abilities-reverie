@@ -1,3 +1,3 @@
-1.0.3
+1.0.0
 ---
-- Remove Guardian Angel - moving to a new pack for Mortal Boons
+- Initial release on 1.20.1 Forge

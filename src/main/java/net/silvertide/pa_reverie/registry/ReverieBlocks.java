@@ -1,18 +1,21 @@
 package net.silvertide.pa_reverie.registry;
 
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.silvertide.pa_reverie.PAReverie;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+import net.silvertide.pa_reverie.PAReverie;
 import net.silvertide.pa_reverie.block.DryAirBlock;
 
 public final class ReverieBlocks {
-    private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(PAReverie.MOD_ID);
+    private static final DeferredRegister<Block> BLOCKS =
+            DeferredRegister.create(ForgeRegistries.BLOCKS, PAReverie.MOD_ID);
 
-    public static final DeferredBlock<DryAirBlock> DRY_AIR = BLOCKS.register("dry_air", () -> new DryAirBlock(
+    public static final RegistryObject<DryAirBlock> DRY_AIR = BLOCKS.register("dry_air", () -> new DryAirBlock(
             BlockBehaviour.Properties.of()
                     .replaceable()
                     .noCollission()

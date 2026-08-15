@@ -1,22 +1,23 @@
 package net.silvertide.pa_reverie.transmute;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.Level;
 
-public class TransmuteRecipe implements Recipe<SingleRecipeInput> {
+public class TransmuteRecipe implements Recipe<Container> {
 
+    private final ResourceLocation id;
     private final Ingredient input;
     private final int inputCount;
     private final ItemStack result;
@@ -24,7 +25,9 @@ public class TransmuteRecipe implements Recipe<SingleRecipeInput> {
     private final int level;
     private final int cooldown;
 
-    public TransmuteRecipe(Ingredient input, int inputCount, ItemStack result, int maxConversions, int level, int cooldown) {
+    public TransmuteRecipe(ResourceLocation id, Ingredient input, int inputCount, ItemStack result,
+                           int maxConversions, int level, int cooldown) {
+        this.id = id;
         this.input = input;
         this.inputCount = inputCount;
         this.result = result;
@@ -58,12 +61,12 @@ public class TransmuteRecipe implements Recipe<SingleRecipeInput> {
     }
 
     @Override
-    public boolean matches(SingleRecipeInput recipeInput, Level level) {
-        return input.test(recipeInput.item());
+    public boolean matches(Container container, Level level) {
+        return input.test(container.getItem(0));
     }
 
     @Override
-    public ItemStack assemble(SingleRecipeInput recipeInput, HolderLookup.Provider registries) {
+    public ItemStack assemble(Container container, RegistryAccess registryAccess) {
         return result.copy();
     }
 
@@ -73,8 +76,13 @@ public class TransmuteRecipe implements Recipe<SingleRecipeInput> {
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider registries) {
+    public ItemStack getResultItem(RegistryAccess registryAccess) {
         return result;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return id;
     }
 
     @Override
@@ -89,33 +97,52 @@ public class TransmuteRecipe implements Recipe<SingleRecipeInput> {
 
     public static class Serializer implements RecipeSerializer<TransmuteRecipe> {
 
-        private final MapCodec<TransmuteRecipe> codec = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(recipe -> recipe.input),
-                Codec.intRange(1, Integer.MAX_VALUE).optionalFieldOf("input_count", 1).forGetter(recipe -> recipe.inputCount),
-                ItemStack.STRICT_CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
-                Codec.intRange(1, Integer.MAX_VALUE).optionalFieldOf("max_conversions", 1).forGetter(recipe -> recipe.maxConversions),
-                Codec.intRange(1, Integer.MAX_VALUE).optionalFieldOf("level", 1).forGetter(recipe -> recipe.level),
-                Codec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("cooldown", 0).forGetter(recipe -> recipe.cooldown)
-        ).apply(instance, TransmuteRecipe::new));
-
-        private final StreamCodec<RegistryFriendlyByteBuf, TransmuteRecipe> streamCodec = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC, recipe -> recipe.input,
-                ByteBufCodecs.VAR_INT, recipe -> recipe.inputCount,
-                ItemStack.STREAM_CODEC, recipe -> recipe.result,
-                ByteBufCodecs.VAR_INT, recipe -> recipe.maxConversions,
-                ByteBufCodecs.VAR_INT, recipe -> recipe.level,
-                ByteBufCodecs.VAR_INT, recipe -> recipe.cooldown,
-                TransmuteRecipe::new
-        );
-
         @Override
-        public MapCodec<TransmuteRecipe> codec() {
-            return codec;
+        public TransmuteRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            return new TransmuteRecipe(recipeId,
+                    Ingredient.fromJson(json.get("ingredient"), false),
+                    atLeast(json, "input_count", 1),
+                    resultFromJson(json),
+                    atLeast(json, "max_conversions", 1),
+                    atLeast(json, "level", 1),
+                    atLeast(json, "cooldown", 0));
+        }
+
+        private static int atLeast(JsonObject json, String field, int minimum) {
+            int value = GsonHelper.getAsInt(json, field, minimum);
+            if (value < minimum) {
+                throw new JsonSyntaxException(field + " must be at least " + minimum + ", was " + value);
+            }
+            return value;
+        }
+
+        private static ItemStack resultFromJson(JsonObject json) {
+            ItemStack result = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(json, "result"));
+            if (result.isEmpty()) {
+                throw new JsonSyntaxException("result must produce at least one item");
+            }
+            return result;
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, TransmuteRecipe> streamCodec() {
-            return streamCodec;
+        public TransmuteRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buf) {
+            return new TransmuteRecipe(recipeId,
+                    Ingredient.fromNetwork(buf),
+                    buf.readVarInt(),
+                    buf.readItem(),
+                    buf.readVarInt(),
+                    buf.readVarInt(),
+                    buf.readVarInt());
+        }
+
+        @Override
+        public void toNetwork(FriendlyByteBuf buf, TransmuteRecipe recipe) {
+            recipe.input.toNetwork(buf);
+            buf.writeVarInt(recipe.inputCount);
+            buf.writeItem(recipe.result);
+            buf.writeVarInt(recipe.maxConversions);
+            buf.writeVarInt(recipe.level);
+            buf.writeVarInt(recipe.cooldown);
         }
     }
 }

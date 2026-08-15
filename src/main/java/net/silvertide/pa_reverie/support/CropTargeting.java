@@ -17,7 +17,7 @@ public final class CropTargeting {
 
     public static final TagKey<Block> TARGETS = TagKey.create(
             Registries.BLOCK,
-            ResourceLocation.fromNamespaceAndPath(PAReverie.MOD_ID, "verdant_cascade_targets")
+            new ResourceLocation(PAReverie.MOD_ID, "verdant_cascade_targets")
     );
 
     private static final IntegerProperty[] KNOWN_AGE_PROPERTIES = {

@@ -1,6 +1,8 @@
 package net.silvertide.pa_reverie.item;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
-import net.silvertide.pa_reverie.registry.ReverieDataComponents;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ public class EphemeralFoodItem extends Item {
 
     private static final int TICKS_PER_SECOND = 20;
     private static final int SECONDS_PER_MINUTE = 60;
+    private static final String EXPIRES_AT_GAME_TIME_TAG = "ExpiresAtGameTime";
 
     private final UseAnim useAnimation;
     private final int defaultLifetimeTicks;
@@ -38,23 +41,27 @@ public class EphemeralFoodItem extends Item {
     }
 
     public static void setExpiration(ItemStack stack, Level level, int lifetimeTicks) {
-        stack.set(ReverieDataComponents.EXPIRES_AT_GAME_TIME.get(), level.getGameTime() + lifetimeTicks);
+        stack.getOrCreateTag().putLong(EXPIRES_AT_GAME_TIME_TAG, level.getGameTime() + lifetimeTicks);
+    }
+
+    @Nullable
+    private static Long expiresAtGameTime(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        return tag != null && tag.contains(EXPIRES_AT_GAME_TIME_TAG, Tag.TAG_LONG)
+                ? tag.getLong(EXPIRES_AT_GAME_TIME_TAG)
+                : null;
     }
 
     public static boolean isExpired(ItemStack stack, Level level) {
-        Long expiresAt = stack.get(ReverieDataComponents.EXPIRES_AT_GAME_TIME.get());
+        Long expiresAt = expiresAtGameTime(stack);
         return expiresAt != null && level.getGameTime() >= expiresAt;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, context, tooltip, flag);
-        Long expiresAt = stack.get(ReverieDataComponents.EXPIRES_AT_GAME_TIME.get());
-        if (expiresAt == null) {
-            return;
-        }
-        Level level = context.level();
-        if (level == null) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+        Long expiresAt = expiresAtGameTime(stack);
+        if (expiresAt == null || level == null) {
             return;
         }
         long remainingTicks = expiresAt - level.getGameTime();

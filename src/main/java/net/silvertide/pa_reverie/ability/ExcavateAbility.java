@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.silvertide.pa_reverie.support.ExcavateJob;
 import net.silvertide.pa_reverie.support.ExcavateVolume;
 import net.silvertide.player_abilities.api.AbilityTickJobs;
@@ -13,7 +14,7 @@ import net.silvertide.player_abilities.api.AbilityUseType;
 import java.util.List;
 
 public final class ExcavateAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 2400;
+    private static final int[] COOLDOWN_SECONDS_BY_LEVEL = {480, 360, 240};
     private static final int BASE_SPELL_POWER = 1;
     private static final int SPELL_POWER_PER_LEVEL = 0;
     private static final int TELEPORT_DROPS_MIN_LEVEL = 3;
@@ -30,7 +31,7 @@ public final class ExcavateAbility extends HarvestAbility {
 
     @Override
     public int getCooldownTicks(int level) {
-        return COOLDOWN_SECONDS * TICKS_PER_SECOND;
+        return byLevel(level, COOLDOWN_SECONDS_BY_LEVEL) * TICKS_PER_SECOND;
     }
 
     @Override
@@ -60,7 +61,7 @@ public final class ExcavateAbility extends HarvestAbility {
     }
 
     private List<BlockPos> computeVolume(ServerPlayer player, int level) {
-        int levelIndex = Math.clamp(level, 1, getMaxLevel()) - 1;
+        int levelIndex = Mth.clamp(level, 1, getMaxLevel()) - 1;
         int spellPowerBonus = ExcavateVolume.bonusForSpellPower(
                 spellPower(player, BASE_SPELL_POWER, SPELL_POWER_PER_LEVEL, level));
         int depth = ExcavateVolume.depthFor(levelIndex, spellPowerBonus);

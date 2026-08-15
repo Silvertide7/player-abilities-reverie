@@ -8,8 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.BlockEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.BlockEvent;
 
 import java.util.List;
 
@@ -78,7 +78,7 @@ public class ExcavateJob {
         List<ItemStack> drops = Block.getDrops(state, level, pos, blockEntity, player, tool);
 
         BlockEvent.BreakEvent breakEvent = new BlockEvent.BreakEvent(level, pos, state, player);
-        NeoForge.EVENT_BUS.post(breakEvent);
+        MinecraftForge.EVENT_BUS.post(breakEvent);
         if (breakEvent.isCanceled()) {
             return;
         }

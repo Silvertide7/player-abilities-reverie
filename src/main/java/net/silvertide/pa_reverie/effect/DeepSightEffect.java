@@ -1,8 +1,6 @@
 package net.silvertide.pa_reverie.effect;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -16,11 +14,6 @@ public class DeepSightEffect extends VisionEffect {
 
     public DeepSightEffect(MobEffectCategory category, int displayColor) {
         super(category, displayColor);
-    }
-
-    @Override
-    protected Holder<MobEffect> getEffectHolder() {
-        return ReverieEffects.DEEP_SIGHT;
     }
 
     public static boolean isSufficientlyUnderground(Level level, LivingEntity entity) {
@@ -37,6 +30,6 @@ public class DeepSightEffect extends VisionEffect {
     }
 
     public static float getIntensity(Player player, float partialTicks) {
-        return VisionEffect.getIntensity(player, ReverieEffects.DEEP_SIGHT, partialTicks);
+        return VisionEffect.getIntensity(player, ReverieEffects.DEEP_SIGHT.get(), partialTicks);
     }
 }

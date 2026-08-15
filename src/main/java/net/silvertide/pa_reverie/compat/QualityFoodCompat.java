@@ -2,7 +2,7 @@ package net.silvertide.pa_reverie.compat;
 
 import de.cadentem.quality_food.util.QualityUtils;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.ModList;
+import net.minecraftforge.fml.ModList;
 
 public final class QualityFoodCompat {
     private static final boolean QUALITY_FOOD_LOADED = ModList.get().isLoaded("quality_food");

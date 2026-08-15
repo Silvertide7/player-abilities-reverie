@@ -2,13 +2,13 @@ package net.silvertide.pa_reverie.event;
 
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.silvertide.pa_reverie.PAReverie;
 import net.silvertide.pa_reverie.registry.ReverieEffects;
 
-@EventBusSubscriber(modid = PAReverie.MOD_ID)
+@Mod.EventBusSubscriber(modid = PAReverie.MOD_ID)
 public final class ShepherdsAuraEventHandlers {
 
     private ShepherdsAuraEventHandlers() {}
@@ -18,8 +18,8 @@ public final class ShepherdsAuraEventHandlers {
         if (!(event.getEntity() instanceof Animal)) {
             return;
         }
-        if (event.getNewAboutToBeSetTarget() instanceof Player player
-                && player.hasEffect(ReverieEffects.SHEPHERDS_AURA)) {
+        if (event.getNewTarget() instanceof Player player
+                && player.hasEffect(ReverieEffects.SHEPHERDS_AURA.get())) {
             event.setCanceled(true);
         }
     }

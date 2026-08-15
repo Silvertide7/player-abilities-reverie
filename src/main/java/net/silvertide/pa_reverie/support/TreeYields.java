@@ -59,10 +59,10 @@ public final class TreeYields {
             return Optional.empty();
         }
         Block leavesBlock = BuiltInRegistries.BLOCK
-                .getOptional(ResourceLocation.fromNamespaceAndPath(logId.getNamespace(), speciesPath + LEAVES_SUFFIX))
+                .getOptional(new ResourceLocation(logId.getNamespace(), speciesPath + LEAVES_SUFFIX))
                 .orElse(null);
         Item saplingItem = BuiltInRegistries.ITEM
-                .getOptional(ResourceLocation.fromNamespaceAndPath(logId.getNamespace(), speciesPath + SAPLING_SUFFIX))
+                .getOptional(new ResourceLocation(logId.getNamespace(), speciesPath + SAPLING_SUFFIX))
                 .orElse(null);
         if (leavesBlock == null || leavesBlock == Blocks.AIR || saplingItem == null || saplingItem == Items.AIR) {
             return Optional.empty();

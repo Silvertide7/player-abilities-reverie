@@ -1,14 +1,14 @@
 package net.silvertide.pa_reverie.event;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.EntityMountEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.silvertide.pa_reverie.PAReverie;
 import net.silvertide.pa_reverie.entity.RiderControlEntity;
 
-@EventBusSubscriber(modid = PAReverie.MOD_ID)
+@Mod.EventBusSubscriber(modid = PAReverie.MOD_ID)
 public final class RiderControlEvents {
 
     private RiderControlEvents() {}

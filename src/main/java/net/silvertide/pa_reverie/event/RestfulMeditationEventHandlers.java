@@ -1,14 +1,14 @@
 package net.silvertide.pa_reverie.event;
 
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.silvertide.pa_reverie.PAReverie;
 import net.silvertide.pa_reverie.effect.RestfulMeditationEffect;
 import net.silvertide.pa_reverie.registry.ReverieEffects;
 
-@EventBusSubscriber(modid = PAReverie.MOD_ID)
+@Mod.EventBusSubscriber(modid = PAReverie.MOD_ID)
 public final class RestfulMeditationEventHandlers {
 
     private RestfulMeditationEventHandlers() {}
@@ -18,7 +18,7 @@ public final class RestfulMeditationEventHandlers {
         if (event.getEffectInstance() == null) {
             return;
         }
-        if (event.getEffectInstance().getEffect().value() != ReverieEffects.RESTFUL_MEDITATION_EFFECT.value()) {
+        if (event.getEffectInstance().getEffect() != ReverieEffects.RESTFUL_MEDITATION_EFFECT.get()) {
             return;
         }
         RestfulMeditationEffect.onMeditationEnded(event.getEntity());

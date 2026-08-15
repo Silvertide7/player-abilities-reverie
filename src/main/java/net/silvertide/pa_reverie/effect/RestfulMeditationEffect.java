@@ -1,12 +1,16 @@
 package net.silvertide.pa_reverie.effect;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TickTask;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.silvertide.pa_reverie.registry.ReverieEffects;
 
 import java.util.Map;
 import java.util.UUID;
@@ -16,7 +20,7 @@ public class RestfulMeditationEffect extends MobEffect {
 
     private static final Map<UUID, Vec3> LOCKED_POSITIONS = new ConcurrentHashMap<>();
 
-    public static final double MOVEMENT_THRESHOLD_SQR = 0.5 * 0.5;
+    private static final double MOVEMENT_THRESHOLD_SQR = 0.5 * 0.5;
 
     private static final int POSITION_CHECK_INTERVAL_TICKS = 10;
 
@@ -48,23 +52,18 @@ public class RestfulMeditationEffect extends MobEffect {
     }
 
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         return true;
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+    public void applyEffectTick(LivingEntity entity, int amplifier) {
         if (entity.level().isClientSide) {
-            return true;
+            return;
         }
-        if (entity.tickCount % POSITION_CHECK_INTERVAL_TICKS == 0) {
-            Vec3 lockedPosition = LOCKED_POSITIONS.get(entity.getUUID());
-            if (lockedPosition == null) {
-                return false;
-            }
-            if (lockedPosition.distanceToSqr(entity.position()) > MOVEMENT_THRESHOLD_SQR) {
-                return false;
-            }
+        if (entity.tickCount % POSITION_CHECK_INTERVAL_TICKS == 0 && hasLeftLockedPosition(entity)) {
+            removeAfterCurrentTick(entity);
+            return;
         }
 
         int healInterval = intervalForAmplifier(HEAL_INTERVAL_TICKS_BY_AMPLIFIER, amplifier);
@@ -77,11 +76,27 @@ public class RestfulMeditationEffect extends MobEffect {
                 player.getFoodData().eat(FOOD_PER_PULSE, SATURATION_PER_PULSE);
             }
         }
-        return true;
+    }
+
+    private static boolean hasLeftLockedPosition(LivingEntity entity) {
+        Vec3 lockedPosition = LOCKED_POSITIONS.get(entity.getUUID());
+        return lockedPosition == null
+                || lockedPosition.distanceToSqr(entity.position()) > MOVEMENT_THRESHOLD_SQR;
+    }
+
+    private static void removeAfterCurrentTick(LivingEntity entity) {
+        MinecraftServer server = entity.getServer();
+        if (server != null) {
+            server.tell(new TickTask(server.getTickCount(), () -> {
+                if (entity.removeEffect(ReverieEffects.RESTFUL_MEDITATION_EFFECT.get())) {
+                    onMeditationEnded(entity);
+                }
+            }));
+        }
     }
 
     private static int intervalForAmplifier(int[] intervalsByAmplifier, int amplifier) {
-        return intervalsByAmplifier[Math.clamp(amplifier, 0, intervalsByAmplifier.length - 1)];
+        return intervalsByAmplifier[Mth.clamp(amplifier, 0, intervalsByAmplifier.length - 1)];
     }
 
     public static void onMeditationEnded(LivingEntity entity) {

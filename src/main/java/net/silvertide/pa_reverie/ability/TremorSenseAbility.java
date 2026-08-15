@@ -8,7 +8,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.silvertide.pa_reverie.network.ReverieNetworking;
 import net.silvertide.pa_reverie.network.TremorSenseHighlightPacket;
 import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.pa_reverie.support.TremorScanner;
@@ -17,7 +17,7 @@ import net.silvertide.player_abilities.api.AbilityAPI;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class TremorSenseAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 2400;
+    private static final int COOLDOWN_SECONDS = 600;
     private static final int BASE_SPELL_POWER = 10;
     private static final int SPELL_POWER_PER_LEVEL = 5;
     private static final int MIN_RADIUS = 4;
@@ -90,7 +90,7 @@ public final class TremorSenseAbility extends HarvestAbility {
             return;
         }
         boolean useTierColors = level >= LEVEL_THAT_ENABLES_TIER_COLORS;
-        PacketDistributor.sendToPlayer(player, new TremorSenseHighlightPacket(
+        ReverieNetworking.sendToPlayer(player, new TremorSenseHighlightPacket(
                 player.blockPosition(), castData.getFoundPositions(),
                 HIGHLIGHT_DURATION_SECONDS * 20, useTierColors));
         player.serverLevel().sendParticles(ParticleTypes.SCULK_SOUL,

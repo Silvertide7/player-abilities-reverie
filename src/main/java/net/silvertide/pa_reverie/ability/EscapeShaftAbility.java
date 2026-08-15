@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.silvertide.pa_reverie.entity.EscapeShaftRiseEntity;
@@ -89,7 +90,7 @@ public final class EscapeShaftAbility extends HarvestAbility {
     }
 
     private double riseSpeedBlocksPerSecond(ServerPlayer player, int level) {
-        return Math.clamp((double) spellPower(player, BASE_SPELL_POWER, SPELL_POWER_PER_LEVEL, level),
+        return Mth.clamp((double) spellPower(player, BASE_SPELL_POWER, SPELL_POWER_PER_LEVEL, level),
                 MIN_RISE_SPEED, MAX_RISE_SPEED);
     }
 }

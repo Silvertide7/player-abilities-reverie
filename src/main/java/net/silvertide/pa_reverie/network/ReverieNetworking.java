@@ -1,68 +1,61 @@
 package net.silvertide.pa_reverie.network;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.simple.SimpleChannel;
 import net.silvertide.pa_reverie.PAReverie;
-import net.silvertide.pa_reverie.client.ClientHunterHandler;
-import net.silvertide.pa_reverie.client.ClientTremorSenseHandler;
 import net.silvertide.pa_reverie.client.EscapeShaftClientGhostShaft;
-import org.jetbrains.annotations.NotNull;
+import net.silvertide.pa_reverie.client.HunterRenderState;
+import net.silvertide.pa_reverie.client.TremorSenseRenderState;
 
-@EventBusSubscriber(modid = PAReverie.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class ReverieNetworking {
 
-    private static final String NETWORK_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "1";
+
+    private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
+            new ResourceLocation(PAReverie.MOD_ID, "main"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals);
 
     private ReverieNetworking() {}
 
-    @SubscribeEvent
-    public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar(NETWORK_VERSION);
-        registrar.playToClient(
-                EscapeShaftSetupPayload.TYPE,
-                EscapeShaftSetupPayload.STREAM_CODEC,
-                ReverieNetworking::handleEscapeShaftSetup
-        );
-        registrar.playToClient(
-                TremorSenseHighlightPacket.TYPE,
-                TremorSenseHighlightPacket.STREAM_CODEC,
-                ClientTremorSenseHandler::handle
-        );
-        registrar.playToClient(
-                HunterHighlightPacket.TYPE,
-                HunterHighlightPacket.STREAM_CODEC,
-                ClientHunterHandler::handle
-        );
+    public static void register() {
+        int id = 0;
+
+        CHANNEL.messageBuilder(EscapeShaftSetupPayload.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(EscapeShaftSetupPayload::encode).decoder(EscapeShaftSetupPayload::decode)
+                .consumerMainThread((msg, ctx) -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                        () -> () -> EscapeShaftClientGhostShaft.applyShaft(msg.min(), msg.max()))).add();
+        CHANNEL.messageBuilder(TremorSenseHighlightPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(TremorSenseHighlightPacket::encode).decoder(TremorSenseHighlightPacket::decode)
+                .consumerMainThread((msg, ctx) -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                        () -> () -> TremorSenseRenderState.install(msg))).add();
+        CHANNEL.messageBuilder(HunterHighlightPacket.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(HunterHighlightPacket::encode).decoder(HunterHighlightPacket::decode)
+                .consumerMainThread((msg, ctx) -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                        () -> () -> HunterRenderState.install(msg))).add();
     }
 
-    private static void handleEscapeShaftSetup(EscapeShaftSetupPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> EscapeShaftClientGhostShaft.applyShaft(payload.min(), payload.max()));
+    public static void sendToPlayer(ServerPlayer player, Object message) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
 
-    public record EscapeShaftSetupPayload(BlockPos min, BlockPos max) implements CustomPacketPayload {
-        public static final CustomPacketPayload.Type<EscapeShaftSetupPayload> TYPE =
-                new CustomPacketPayload.Type<>(
-                        ResourceLocation.fromNamespaceAndPath(PAReverie.MOD_ID, "escape_shaft_setup")
-                );
+    public record EscapeShaftSetupPayload(BlockPos min, BlockPos max) {
+        public void encode(FriendlyByteBuf buf) {
+            buf.writeBlockPos(min);
+            buf.writeBlockPos(max);
+        }
 
-        public static final StreamCodec<ByteBuf, EscapeShaftSetupPayload> STREAM_CODEC =
-                StreamCodec.composite(
-                        BlockPos.STREAM_CODEC, EscapeShaftSetupPayload::min,
-                        BlockPos.STREAM_CODEC, EscapeShaftSetupPayload::max,
-                        EscapeShaftSetupPayload::new
-                );
-
-        @Override
-        public CustomPacketPayload.@NotNull Type<EscapeShaftSetupPayload> type() {
-            return TYPE;
+        public static EscapeShaftSetupPayload decode(FriendlyByteBuf buf) {
+            return new EscapeShaftSetupPayload(buf.readBlockPos(), buf.readBlockPos());
         }
     }
 }

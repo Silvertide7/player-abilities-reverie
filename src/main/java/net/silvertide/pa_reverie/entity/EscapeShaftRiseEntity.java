@@ -13,7 +13,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.silvertide.pa_reverie.network.ReverieNetworking;
 import net.silvertide.pa_reverie.registry.ReverieEntities;
 
@@ -63,7 +62,7 @@ public class EscapeShaftRiseEntity extends RiderControlEntity {
             vehicle.hurtMarked = true;
             level.addFreshEntity(vehicle);
             participant.startRiding(vehicle, true);
-            PacketDistributor.sendToPlayer(participant,
+            ReverieNetworking.sendToPlayer(participant,
                     new ReverieNetworking.EscapeShaftSetupPayload(shaftBounds.min(), shaftBounds.max()));
         }
     }

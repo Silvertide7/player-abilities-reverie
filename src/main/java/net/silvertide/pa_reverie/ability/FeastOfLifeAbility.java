@@ -1,6 +1,6 @@
 package net.silvertide.pa_reverie.ability;
 
-import net.minecraft.core.component.DataComponents;
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -17,12 +17,13 @@ import net.silvertide.pa_reverie.support.AbilityPower;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class FeastOfLifeAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 1200;
+    private static final int COOLDOWN_SECONDS = 300;
     private static final float MAX_ABSORPTION = 40.0f;
     private static final float[] POTENCY_BY_LEVEL = {1.0f, 1.35f, 1.7f};
     private static final float[] EFFECT_DURATION_MULTIPLIER_BY_LEVEL = {1.2f, 1.3f, 1.4f};
     private static final double FEAST_SHARE_RADIUS = 4.0;
     private static final int FEAST_PARTICLE_COUNT = 12;
+    private static final float SATURATION_PER_NUTRITION_POINT = 2.0f;
 
     @Override
     public AbilityUseType getUseType() {
@@ -55,16 +56,19 @@ public final class FeastOfLifeAbility extends HarvestAbility {
         if (food == null) {
             return;
         }
-        FoodProperties properties = food.get(DataComponents.FOOD);
+        FoodProperties properties = food.getFoodProperties(player);
+        if (properties == null) {
+            return;
+        }
         float potency = byLevel(level, POTENCY_BY_LEVEL);
         float qualityMultiplier = 1.0f + net.silvertide.pa_reverie.compat.QualityFoodCompat.qualityLevel(food)
                 * ServerConfigs.FEAST_OF_LIFE_QUALITY_BONUS_PER_LEVEL.get().floatValue();
         float multiplier = potency * qualityMultiplier;
 
         float healAmount = (float) AbilityPower.scaled(
-                player, properties.nutrition() * ServerConfigs.FEAST_OF_LIFE_HEALTH_PER_NUTRITION.get().floatValue() * multiplier);
+                player, properties.getNutrition() * ServerConfigs.FEAST_OF_LIFE_HEALTH_PER_NUTRITION.get().floatValue() * multiplier);
         float absorptionAmount = (float) AbilityPower.scaled(
-                player, properties.saturation() * ServerConfigs.FEAST_OF_LIFE_ABSORPTION_PER_SATURATION.get().floatValue() * multiplier);
+                player, saturationOf(properties) * ServerConfigs.FEAST_OF_LIFE_ABSORPTION_PER_SATURATION.get().floatValue() * multiplier);
 
         for (Player target : player.level().getEntitiesOfClass(
                 Player.class, player.getBoundingBox().inflate(FEAST_SHARE_RADIUS))) {
@@ -91,13 +95,17 @@ public final class FeastOfLifeAbility extends HarvestAbility {
     }
 
     private static boolean isFood(ItemStack stack) {
-        return !stack.isEmpty() && stack.has(DataComponents.FOOD);
+        return !stack.isEmpty() && stack.isEdible();
+    }
+
+    private static float saturationOf(FoodProperties properties) {
+        return properties.getNutrition() * properties.getSaturationModifier() * SATURATION_PER_NUTRITION_POINT;
     }
 
     private static void applyFoodEffects(LivingEntity entity, FoodProperties properties, int level) {
         float durationMultiplier = byLevel(level, EFFECT_DURATION_MULTIPLIER_BY_LEVEL);
-        for (FoodProperties.PossibleEffect possibleEffect : properties.effects()) {
-            MobEffectInstance effect = possibleEffect.effect();
+        for (Pair<MobEffectInstance, Float> possibleEffect : properties.getEffects()) {
+            MobEffectInstance effect = possibleEffect.getFirst();
             entity.addEffect(new MobEffectInstance(
                     effect.getEffect(),
                     Math.round(effect.getDuration() * durationMultiplier),

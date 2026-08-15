@@ -6,6 +6,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.material.FluidState;
@@ -14,7 +15,7 @@ import net.silvertide.pa_reverie.registry.ReverieEffects;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class PeacefulReverieAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 1800;
+    private static final int COOLDOWN_SECONDS = 600;
     private static final int[] EFFECT_DURATION_TICKS_BY_LEVEL = {6000, 8400, 12000};
     private static final int REQUIRED_TOTAL_WATER_SOURCES = 30;
     private static final int REQUIRED_TOP_LAYER_SOURCES = 10;
@@ -95,10 +96,10 @@ public final class PeacefulReverieAbility extends HarvestAbility {
 
     @Override
     public void onUseReleased(ServerPlayer player, int level) {
-        int clampedIndex = Math.clamp(level, 1, getMaxLevel()) - 1;
+        int clampedIndex = Mth.clamp(level, 1, getMaxLevel()) - 1;
         int durationTicks = EFFECT_DURATION_TICKS_BY_LEVEL[clampedIndex];
         PeacefulReverieEffect.lockPositionFor(player);
-        player.addEffect(new MobEffectInstance(ReverieEffects.PEACEFUL_REVERIE_EFFECT,
+        player.addEffect(new MobEffectInstance(ReverieEffects.PEACEFUL_REVERIE_EFFECT.get(),
                 durationTicks, clampedIndex, false, false, true));
         if (level >= getMaxLevel()) {
             player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, durationTicks, 0, false, false, true));

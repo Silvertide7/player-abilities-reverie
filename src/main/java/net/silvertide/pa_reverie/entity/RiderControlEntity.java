@@ -1,15 +1,12 @@
 package net.silvertide.pa_reverie.entity;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,13 +78,13 @@ public abstract class RiderControlEntity extends Entity {
     }
 
     @Override
-    public void onRemovedFromLevel() {
+    public void onRemovedFromWorld() {
         finished = true;
         if (level() instanceof ServerLevel serverLevel) {
             onControlEnded(serverLevel);
         }
         ejectPassengers();
-        super.onRemovedFromLevel();
+        super.onRemovedFromWorld();
     }
 
     @Override
@@ -122,12 +119,12 @@ public abstract class RiderControlEntity extends Entity {
     }
 
     @Override
-    protected @NotNull Vec3 getPassengerAttachmentPoint(@NotNull Entity passenger, @NotNull EntityDimensions dimensions, float scale) {
-        return Vec3.ZERO;
+    public double getPassengersRidingOffset() {
+        return 0.0;
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.@NotNull Builder builder) {}
+    protected void defineSynchedData() {}
 
     @Override
     protected void readAdditionalSaveData(@NotNull CompoundTag tag) {}

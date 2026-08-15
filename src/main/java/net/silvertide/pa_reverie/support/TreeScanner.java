@@ -155,7 +155,7 @@ public final class TreeScanner {
                 treeRoot.getX() + 0.5,
                 treeRoot.getY() + 0.5,
                 treeRoot.getZ() + 0.5,
-                SoundEvents.NOTE_BLOCK_CHIME,
+                SoundEvents.NOTE_BLOCK_CHIME.value(),
                 SoundSource.PLAYERS,
                 CHIME_VOLUME,
                 pitch

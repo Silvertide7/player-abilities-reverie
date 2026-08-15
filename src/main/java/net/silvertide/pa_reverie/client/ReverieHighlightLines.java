@@ -28,21 +28,21 @@ public final class ReverieHighlightLines {
     private static void edgeAlongX(VertexConsumer consumer, Matrix4f matrix,
                                    float x0, float x1, float y, float z,
                                    int r, int g, int b, int a) {
-        consumer.addVertex(matrix, x0, y, z).setColor(r, g, b, a).setNormal(1f, 0f, 0f);
-        consumer.addVertex(matrix, x1, y, z).setColor(r, g, b, a).setNormal(1f, 0f, 0f);
+        consumer.vertex(matrix, x0, y, z).color(r, g, b, a).normal(1f, 0f, 0f).endVertex();
+        consumer.vertex(matrix, x1, y, z).color(r, g, b, a).normal(1f, 0f, 0f).endVertex();
     }
 
     private static void edgeAlongY(VertexConsumer consumer, Matrix4f matrix,
                                    float x, float y0, float y1, float z,
                                    int r, int g, int b, int a) {
-        consumer.addVertex(matrix, x, y0, z).setColor(r, g, b, a).setNormal(0f, 1f, 0f);
-        consumer.addVertex(matrix, x, y1, z).setColor(r, g, b, a).setNormal(0f, 1f, 0f);
+        consumer.vertex(matrix, x, y0, z).color(r, g, b, a).normal(0f, 1f, 0f).endVertex();
+        consumer.vertex(matrix, x, y1, z).color(r, g, b, a).normal(0f, 1f, 0f).endVertex();
     }
 
     private static void edgeAlongZ(VertexConsumer consumer, Matrix4f matrix,
                                    float x, float y, float z0, float z1,
                                    int r, int g, int b, int a) {
-        consumer.addVertex(matrix, x, y, z0).setColor(r, g, b, a).setNormal(0f, 0f, 1f);
-        consumer.addVertex(matrix, x, y, z1).setColor(r, g, b, a).setNormal(0f, 0f, 1f);
+        consumer.vertex(matrix, x, y, z0).color(r, g, b, a).normal(0f, 0f, 1f).endVertex();
+        consumer.vertex(matrix, x, y, z1).color(r, g, b, a).normal(0f, 0f, 1f).endVertex();
     }
 }

@@ -1,5 +1,7 @@
 package net.silvertide.pa_reverie.effect;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TickTask;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
@@ -17,7 +19,7 @@ public class PeacefulReverieEffect extends MobEffect {
 
     private static final Map<UUID, Vec3> LOCKED_POSITIONS = new ConcurrentHashMap<>();
 
-    public static final double MOVEMENT_THRESHOLD_SQR = 0.5 * 0.5;
+    private static final double MOVEMENT_THRESHOLD_SQR = 0.5 * 0.5;
 
     private static final int POSITION_CHECK_INTERVAL_TICKS = 10;
 
@@ -41,26 +43,35 @@ public class PeacefulReverieEffect extends MobEffect {
     }
 
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         return true;
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+    public void applyEffectTick(LivingEntity entity, int amplifier) {
         if (entity.level().isClientSide) {
-            return true;
+            return;
         }
-        if (entity.tickCount % POSITION_CHECK_INTERVAL_TICKS == 0) {
-            Vec3 lockedPosition = LOCKED_POSITIONS.get(entity.getUUID());
-            if (lockedPosition == null) {
-                return false;
-            }
-            if (lockedPosition.distanceToSqr(entity.position()) > MOVEMENT_THRESHOLD_SQR) {
-                return false;
-            }
+        if (entity.tickCount % POSITION_CHECK_INTERVAL_TICKS == 0 && hasLeftLockedPosition(entity)) {
+            removeAfterCurrentTick(entity);
         }
+    }
 
-        return true;
+    private static boolean hasLeftLockedPosition(LivingEntity entity) {
+        Vec3 lockedPosition = LOCKED_POSITIONS.get(entity.getUUID());
+        return lockedPosition == null
+                || lockedPosition.distanceToSqr(entity.position()) > MOVEMENT_THRESHOLD_SQR;
+    }
+
+    private static void removeAfterCurrentTick(LivingEntity entity) {
+        MinecraftServer server = entity.getServer();
+        if (server != null) {
+            server.tell(new TickTask(server.getTickCount(), () -> {
+                if (entity.removeEffect(ReverieEffects.PEACEFUL_REVERIE_EFFECT.get())) {
+                    onReverieEnded(entity);
+                }
+            }));
+        }
     }
 
     public static void onReverieEnded(LivingEntity entity) {
@@ -79,11 +90,11 @@ public class PeacefulReverieEffect extends MobEffect {
     }
 
     public static boolean isActiveOn(LivingEntity entity) {
-        return entity.hasEffect(ReverieEffects.PEACEFUL_REVERIE_EFFECT);
+        return entity.hasEffect(ReverieEffects.PEACEFUL_REVERIE_EFFECT.get());
     }
 
     public static int amplifierFor(LivingEntity entity) {
-        var instance = entity.getEffect(ReverieEffects.PEACEFUL_REVERIE_EFFECT);
+        var instance = entity.getEffect(ReverieEffects.PEACEFUL_REVERIE_EFFECT.get());
         return instance == null ? 0 : instance.getAmplifier();
     }
 }

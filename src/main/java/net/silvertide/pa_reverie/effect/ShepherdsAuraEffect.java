@@ -1,6 +1,7 @@
 package net.silvertide.pa_reverie.effect;
 
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -37,7 +38,7 @@ public class ShepherdsAuraEffect extends MobEffect {
     }
 
     public static int auraRadiusForAmplifier(int amplifier) {
-        return AURA_RADIUS_BY_AMPLIFIER[Math.clamp(amplifier, 0, AURA_RADIUS_BY_AMPLIFIER.length - 1)];
+        return AURA_RADIUS_BY_AMPLIFIER[Mth.clamp(amplifier, 0, AURA_RADIUS_BY_AMPLIFIER.length - 1)];
     }
 
     private static int scaledAuraRadius(ServerPlayer shepherd, int amplifier) {
@@ -46,22 +47,21 @@ public class ShepherdsAuraEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(@NotNull LivingEntity livingEntity, int amplifier) {
+    public void applyEffectTick(@NotNull LivingEntity livingEntity, int amplifier) {
         if (livingEntity instanceof ServerPlayer shepherd) {
             tendFlock(shepherd, amplifier);
         }
-        return true;
     }
 
     @Override
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         return duration % AURA_TICK_INTERVAL_TICKS == 0;
     }
 
     private void tendFlock(ServerPlayer shepherd, int amplifier) {
         AABB auraBox = shepherd.getBoundingBox().inflate(scaledAuraRadius(shepherd, amplifier));
         List<Animal> flock = shepherd.serverLevel().getEntitiesOfClass(Animal.class, auraBox, Animal::isAlive);
-        float healAmount = (float) AbilityPower.scaled(shepherd, HEAL_AMOUNT_BY_AMPLIFIER[Math.clamp(amplifier, 0, HEAL_AMOUNT_BY_AMPLIFIER.length - 1)]);
+        float healAmount = (float) AbilityPower.scaled(shepherd, HEAL_AMOUNT_BY_AMPLIFIER[Mth.clamp(amplifier, 0, HEAL_AMOUNT_BY_AMPLIFIER.length - 1)]);
         int tended = 0;
         for (Animal animal : flock) {
             if (tended >= MAX_FLOCK_SIZE) {

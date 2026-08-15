@@ -5,6 +5,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +20,7 @@ import net.silvertide.player_abilities.api.AbilityTickJobs;
 import net.silvertide.player_abilities.api.AbilityUseType;
 
 public final class VerdantCascadeAbility extends HarvestAbility {
-    private static final int COOLDOWN_SECONDS = 3600;
+    private static final int COOLDOWN_SECONDS = 1800;
     private static final int BASE_SPELL_POWER = 100;
     private static final int SPELL_POWER_PER_LEVEL = 100;
     private static final int MIN_CHAIN = 100;
@@ -116,7 +117,7 @@ public final class VerdantCascadeAbility extends HarvestAbility {
     }
 
     private int chainMax(ServerPlayer player, int level) {
-        return Math.clamp(Math.round(spellPower(player, BASE_SPELL_POWER, SPELL_POWER_PER_LEVEL, level)),
+        return Mth.clamp(Math.round(spellPower(player, BASE_SPELL_POWER, SPELL_POWER_PER_LEVEL, level)),
                 MIN_CHAIN, MAX_CHAIN);
     }
 

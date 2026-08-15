@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -26,7 +27,7 @@ public final class ExcavateVolume {
     private ExcavateVolume() {}
 
     public static int bonusForSpellPower(float spellPower) {
-        return Math.clamp(Math.round((spellPower - SPELL_POWER_BASELINE) * SPELL_POWER_BONUS_SLOPE), 0, MAX_SPELL_POWER_BONUS);
+        return Mth.clamp((int) Math.round((spellPower - SPELL_POWER_BASELINE) * SPELL_POWER_BONUS_SLOPE), 0, MAX_SPELL_POWER_BONUS);
     }
 
     public static int depthFor(int levelIndex, int spellPowerBonus) {

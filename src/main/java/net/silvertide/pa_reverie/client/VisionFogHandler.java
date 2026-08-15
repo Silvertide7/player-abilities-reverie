@@ -6,15 +6,15 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.FogType;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.silvertide.pa_reverie.PAReverie;
 import net.silvertide.pa_reverie.effect.DeepSightEffect;
 import net.silvertide.pa_reverie.registry.ReverieEffects;
 
-@EventBusSubscriber(modid = PAReverie.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = PAReverie.MOD_ID, value = Dist.CLIENT)
 public final class VisionFogHandler {
 
     private static final float[] DEEP_SIGHT_FOG_FAR_BY_AMPLIFIER = { 16.0f, 28.0f, 56.0f };
@@ -45,7 +45,7 @@ public final class VisionFogHandler {
         if (event.getCamera().getFluidInCamera() != FogType.WATER) {
             return false;
         }
-        MobEffectInstance effect = localPlayer.getEffect(ReverieEffects.FATHOMS_EYE);
+        MobEffectInstance effect = localPlayer.getEffect(ReverieEffects.FATHOMS_EYE.get());
         if (effect == null) {
             return false;
         }
@@ -56,7 +56,7 @@ public final class VisionFogHandler {
     }
 
     private static boolean tryApplyDeepSightFog(ViewportEvent.RenderFog event, Player localPlayer) {
-        MobEffectInstance effect = localPlayer.getEffect(ReverieEffects.DEEP_SIGHT);
+        MobEffectInstance effect = localPlayer.getEffect(ReverieEffects.DEEP_SIGHT.get());
         if (effect == null) {
             return false;
         }
@@ -81,7 +81,7 @@ public final class VisionFogHandler {
         if (localPlayer == null) {
             return;
         }
-        MobEffectInstance effect = localPlayer.getEffect(ReverieEffects.DEEP_SIGHT);
+        MobEffectInstance effect = localPlayer.getEffect(ReverieEffects.DEEP_SIGHT.get());
         if (effect == null) {
             return;
         }
