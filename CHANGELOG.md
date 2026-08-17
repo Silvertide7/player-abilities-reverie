@@ -1,3 +1,3 @@
-1.0.0
+1.0.1
 ---
-- Initial release on 1.20.1 Forge
+- Fix sight abilities cooldowns
